@@ -1,7 +1,6 @@
 # Tropical stethoscope
 Analyzing sound data to estimate biodiversity, in collaboration witn Zuzana Burivalova
 
-- Eric Li
 - Yuren Sun
 
 # Steps to clone the repo locally

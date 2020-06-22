@@ -24,15 +24,132 @@ Top 150 frequency: 142 120 113  92  72  69  57  45  43  40  35  33  32  32  30  
 
 Tested with sonotypes with highest k number of data
 
+ 10*np.log10(Sxx). Not work
+
+### 43 data for different number of classes
+
+<img src="/Users/sun/Typora_pics/43_sonotypes_comparison.png" alt="43_sonotypes_comparison" style="zoom:50%;" />
+
+52, 138, 463, 86, 139, 220
+
+| Classes | validation number | Accuracy |
+| :------ | ----------------- | -------- |
+| 2       | 9                 | 0.8889   |
+| 3       | 13                | 76.92    |
+| 4       | 18                | 44.44    |
+| 5       | 22                | 40.91    |
+| 6       | 28                | 30.77    |
+
+3 loss: 0.4509 - accuracy: 0.7759 - val_loss: 0.9303 - val_accuracy: 0.7692
+4 loss: 1.0052 - accuracy: 0.5649 - val_loss: 1.4301 - val_accuracy: 0.4444
+5 loss: 0.3115 - accuracy: 0.8860 - val_loss: 3.6770 - val_accuracy: 0.4091
+
+### Thresholding, normalization
+
+Tested with only birds
+Sonotypes (order or decreasing number): 52, 138, 463, 86, 139, 220
+normalization with ((cur_spec - s_min)/(s_max - s_min) * 255)
+
+| Types | number of data/each | Thresholding (70-90) | Normalization, * 255 | Normalization | w/o both |
+| :---- | ------------------- | -------------------- | -------------------- | ------------- | -------- |
+| 2     | 120                 | 95.83                | 100                  | 95.83         | 62.50    |
+| 3     | 91                  | 95.83                | 97.92                | 95.83         | 40.00    |
+| 4     | 57                  | 60.87                | 60.87                | 54.35         |          |
+| 5     | 45                  | 43.48                | 43.38                |               |          |
+| 6     | 43                  | 26.92                | 30.77                |               |          |
+
+Normalization, *255
+2: loss: 0.0011 - accuracy: 1.0000 - val_loss: 0.0211 - val_accuracy: 1.0000
+3: oss: 0.0150 - accuracy: 0.9948 - val_loss: 0.0819 - val_accuracy: 0.9792
+4: loss: 0.0842 - accuracy: 0.9805 - val_loss: 4.4760 - val_accuracy: 0.6087
+5: loss: 0.3897 - accuracy: 0.8713 - val_loss: 3.1227 - val_accuracy: 0.4348
+6: loss: 2.4047 - accuracy: 0.2802 - val_loss: 1.9193 - val_accuracy: 0.3077
+
+Normalization, no *255
+2: loss: 0.0013 - accuracy: 1.0000 - val_loss: 0.0809 - val_accuracy: 0.9583
+3: loss: 0.0709 - accuracy: 0.9844 - val_loss: 0.1802 - val_accuracy: 0.9583
+4: loss: 0.2645 - accuracy: 0.9011 - val_loss: 3.5054 - val_accuracy: 0.5435
+
+
+
 ### Experiment
+
+52 & 86, overlap in frequency range, able to classify with 57 data
+loss: 0.0341 - accuracy: 0.9890 - val_loss: 0.0302 - val_accuracy: 1.0000
 
  **To know how many samples are needed**
 
-<!--（to be done)-->Pick the 3 classes (52,138,463) that have high accuracy (92%). Say that these classes have 92 samples. Do tests decreasing the sample size: 92,91,90,....and plot how the accuracy (Y-axis) changes with sample size (X-axis). This will allow us to know how many samples are needed
+Pick the 3 classes (52,138,463) that have high accuracy (92%). Say that these classes have 92 samples. Do tests decreasing the sample size: 92,91,90,....and plot how the accuracy (Y-axis) changes with sample size (X-axis). This will allow us to know how many samples are needed
 
-#### Repeat the above experiment with only 2 classes, 52 and 138
+Need to repeat for many times till get the random data good enough to reach the high accuracy starting from 80 data
+Repeat: model is easy to overfit the training data. The val_loss goes high after a few epoches.
 
-<!--need to check the generated spectrogram-->
+![accurancy_different_sample_size](/Users/sun/Typora_pics/accurancy_different_sample_size.png)
+
+#### 3 classes, 52, 138, 463
+
+28 data for validation
+91 loss: 0.0150 - accuracy: 0.9948 - val_loss: 0.0819 - val_accuracy: 0.9792
+
+27 for validation
+90 loss: 0.0516 - accuracy: 0.9918 - val_loss: 0.2503 - val_accuracy: 0.9529
+89 loss: 0.0641 - accuracy: 0.9708 - val_loss: 0.3682 - val_accuracy: 0.9259
+88 loloss: 0.0093 - accuracy: 1.0000 - val_loss: 0.2222 - val_accuracy: 0.9630
+87 loss: 0.0154 - accuracy: 0.9957 - val_loss: 0.4732 - val_accuracy: 0.9630
+
+26 for validation
+86 loss: 0.1802 - accuracy: 0.9353 - val_loss: 0.2362 - val_accuracy: 0.9231
+85 loss: 0.0873 - accuracy: 0.9782 - val_loss: 0.1352 - val_accuracy: 0.9615
+84 loss: 0.1341 - accuracy: 0.9558 - val_loss: 0.2886 - val_accuracy: 0.9615
+
+25 for validation
+83 loss: 31.4726 - accuracy: 0.8616 - val_loss: 1.6562 - val_accuracy: 0.9600
+82 loss: 32.5113 - accuracy: 0.9616 - val_loss: 3.1294 - val_accuracy: 0.9600
+81  loss: 74.6881 - accuracy: 0.8211 - val_loss: 397.4071 - val_accuracy: 0.9200
+
+24 for validation
+80 loss: 140.2473 - accuracy: 0.6991 - val_loss: 39.7443 - val_accuracy: 0.8333
+79 loss: 0.0894 - accuracy: 0.9718 - val_loss: 0.9891 - val_accuracy: 0.8333
+78 loss: 0.0892 - accuracy: 0.9619 - val_loss: 0.3288 - val_accuracy: 0.9583
+77 loss: 25.5467 - accuracy: 0.9324 - val_loss: 16.5913 - val_accuracy: 0.9167
+
+23 for validation
+76 loss: 8.3883 - accuracy: 0.9707 - val_loss: 91.9992 - val_accuracy: 0.8696
+75 loss: 3.9293 - accuracy: 0.9752 - val_loss: 7.3834 - val_accuracy: 0.8696
+74 loss: 21.2090 - accuracy: 0.9296 - val_loss: 23.0440 - val_accuracy: 0.9130
+
+22 for validation
+73 loss: 15.3687 - accuracy: 0.9594 - val_loss: 133.4415 - val_accuracy: 0.8636
+72 loss: 19.4985 - accuracy: 0.9227 - val_loss: 13.9987 - val_accuracy: 0.8636
+71 loss: 3.9067 - accuracy: 0.9581 - val_loss: 57.5173 - val_accuracy: 0.9091
+
+21 for validation
+70 loss: 3.9066 - accuracy: 0.9683 - val_loss: 22.7109 - val_accuracy: 0.8571
+69 loss: 3.9034 - accuracy: 0.9892 - val_loss: 32.5230 - val_accuracy: 0.9048
+68 loss: 7.0706 - accuracy: 0.9727 - val_loss: 77.9176 - val_accuracy: 0.9524
+67 loss: 24.7759 - accuracy: 0.9333 - val_loss: 79.8080 - val_accuracy: 0.9048
+
+20 for validation
+66 loss: 9.9766 - accuracy: 0.9551 - val_loss: 12.9988 - val_accuracy: 0.9000
+65 loss: 46.5290 - accuracy: 0.8914 - val_loss: 17.8715 - val_accuracy: 0.9000
+64 loss: 8.5313 - accuracy: 0.9593 - val_loss: 46.5058 - val_accuracy: 0.9000
+
+19 for validation
+63 loss: 6.8372 - accuracy: 0.9706 - val_loss: 38.7598 - val_accuracy: 0.8947
+62 loss: 6.5576 - accuracy: 0.9641 - val_loss: 6.5716 - val_accuracy: 0.8947
+61 loss: 12.3140 - accuracy: 0.9390 - val_loss: 30.0597 - val_accuracy: 0.8947
+
+18 for validation
+60 loss: 17.2051 - accuracy: 0.9568 - val_loss: 49.0847 - val_accuracy: 0.8333
+59 loss: 6.6145 - accuracy: 0.9560 - val_loss: 14.3925 - val_accuracy: 0.8889
+58 loss: 13.2819 - accuracy: 0.9679 - val_loss: 90.0838 - val_accuracy: 0.8333
+57 
+
+
+
+
+#### 2 classes, 52 and 138
+
 **Current resuls are not stable and change a lot with different randomly choose training & testing data.**
 
 Test 30 more epoch when achieve a higher val_accuracy or the val_loss keeps decreasing.
@@ -146,8 +263,8 @@ Test 30 more epoch when achieve a higher val_accuracy or the val_loss keeps decr
 50 loss: 0.1375 - accuracy: 0.9556 - val_loss: 2.1524 - val_accuracy: 0.6000
 	loss: 0.0737 - accuracy: 0.9889 - val_loss: 0.2495 - val_accuracy: 0.9000
 49 loss: 0.0017 - accuracy: 1.0000 - val_loss: 0.0520 - val_accuracy: 1.0000
-48 x3 loss: 0.1620 - accuracy: 0.9535 - val_loss: 0.0731 - val_accuracy: 1.0000
-47 x6 loss: 0.0783 - accuracy: 0.9643 - val_loss: 0.0168 - val_accuracy: 1.0000
+48 x3 loss: 0.1620 - accuracy: 0.9535 - val_loss: 0.0731 - val_accuracy: 0.9000
+47 x6 loss: 0.0783 - accuracy: 0.9643 - val_loss: 0.0168 - val_accuracy: 0.9000
 46 x4 loss: 0.0252 - accuracy: 0.9878 - val_loss: 0.0351 - val_accuracy: 1.0000
 
 9 for validation
@@ -155,19 +272,19 @@ Test 30 more epoch when achieve a higher val_accuracy or the val_loss keeps decr
 44 x4 loss: 0.1394 - accuracy: 0.9367 - val_loss: 0.1448 - val_accuracy: 1.0000
 43 x8 loss: 0.0038 - accuracy: 1.0000 - val_loss: 0.7115 - val_accuracy: 0.8889
 		loss: 0.2686 - accuracy: 0.9221 - val_loss: 0.0881 - val_accuracy: 1.0000
-44 loss: 0.0051 - accuracy: 1.0000 - val_loss: 0.0120 - val_accuracy: 1.0000
-43 loss: 0.0468 - accuracy: 0.9733 - val_loss: 0.0954 - val_accuracy: 1.0000
-42 x2 loss: 0.0325 - accuracy: 1.0000 - val_loss: 0.0720 - val_accuracy: 1.0000
-41 loss: 0.0254 - accuracy: 0.9863 - val_loss: 0.0475 - val_accuracy: 1.0000
+44 loss: 0.0051 - accuracy: 1.0000 - val_loss: 0.0120 - val_accuracy: 0.8889
+43 loss: 0.0468 - accuracy: 0.9733 - val_loss: 0.0954 - val_accuracy: 0.8889
+42 x2 loss: 0.0325 - accuracy: 1.0000 - val_loss: 0.0720 - val_accuracy: 0.8889
+41 loss: 0.0254 - accuracy: 0.9863 - val_loss: 0.0475 - val_accuracy: 0.8889
 
 8 for validation
-40 loss: 0.1569 - accuracy: 0.9722 - val_loss: 0.0523 - val_accuracy: 1.0000
+40 loss: 0.1569 - accuracy: 0.9722 - val_loss: 0.0523 - val_accuracy: 0.8750
 
 6 for validation
-30  loss: 0.1526 - accuracy: 0.9630 - val_loss: 0.1200 - val_accuracy: 1.0000
+30  loss: 0.1526 - accuracy: 0.9630 - val_loss: 0.1200 - val_accuracy: 0.8333
 
 5 for validation
-25 loss: 0.0954 - accuracy: 0.9556 - val_loss: 0.2874 - val_accuracy: 1.0000
+25 loss: 0.0954 - accuracy: 0.9556 - val_loss: 0.2874 - val_accuracy: 0.8000
 24 loss: 0.0026 - accuracy: 1.0000 - val_loss: 1.5397 - val_accuracy: 0.8000
 23 loss: 0.0059 - accuracy: 1.0000 - val_loss: 1.1524 - val_accuracy: 0.8000
 22 x2 loss: 0.0156 - accuracy: 1.0000 - val_loss: 3.0134 - val_accuracy: 0.8000
@@ -195,7 +312,7 @@ Sonotypes (order or decreasing number): 52, 138, 463, 86, 139, 220
 | Types | number of data | Accuracy (%) |
 | :---- | -------------- | ------------ |
 | 2     | 120            | 95.83        |
-| 3     | 92             | 92.86        |
+| 3     | 91             | 92.86        |
 | 4     | 57             | 60.87        |
 | 5     | 45             | 43.48        |
 | 6     | 43             | 26.92        |
@@ -226,7 +343,7 @@ Sonotypes (order or decreasing number): 52, 138, 25, 463, 236
 | :---- | -------------- | ------------ |
 | 2     | 120            | 95.83        |
 | 3     | 113            | 44.12        |
-| 4     | 92             | 37.84        |
+| 4     | 91             | 37.84        |
 | 5     | 72             | 13.89        |
 
 2 types, 120 each
@@ -253,7 +370,7 @@ loss: 368.9658 - accuracy: 0.3958 - val_loss: 191.2737 - val_accuracy: 0.3784
 | :---- | -------------- | ------------ |
 | 2     | 120            | 81.48        |
 | 3     | 113            | 34.21        |
-| 4     | 92             | 19.15        |
+| 4     | 91             | 19.15        |
 
 2 types,
 
@@ -283,7 +400,7 @@ not work
 | :---- | -------------- | ------------ |
 | 2     | 120            | 81.48        |
 | 3     | 113            | 100          |
-| 4     | 92             | 100          |
+| 4     | 91             | 100          |
 | 5     | 72             | 95           |
 
 2 types, 120 each

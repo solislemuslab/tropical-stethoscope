@@ -28,7 +28,7 @@ Tested with sonotypes with highest k number of data
 
 ### 43 data for different number of classes
 
-<img src="/Users/sun/Typora_pics/43_sonotypes_comparison.png" alt="43_sonotypes_comparison" style="zoom:50%;" />
+<img src="imgs/43_sonotypes_comparison.png" alt="43_sonotypes_comparison" style="zoom:50%;" />
 
 52, 138, 463, 86, 139, 220
 
@@ -84,7 +84,7 @@ Pick the 3 classes (52,138,463) that have high accuracy (92%). Say that these cl
 Need to repeat for many times till get the random data good enough to reach the high accuracy starting from 80 data
 Repeat: model is easy to overfit the training data. The val_loss goes high after a few epoches.
 
-![accurancy_different_sample_size](/Users/sun/Typora_pics/accurancy_different_sample_size.png)
+![accurancy_different_sample_size](imgs/accurancy_different_sample_size.png)
 
 #### 3 classes, 52, 138, 463
 

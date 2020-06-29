@@ -8,6 +8,8 @@ Classification: https://colab.research.google.com/drive/1mUK81IBL4Dz1X76jQjlJbFw
 
 Dataset creation: https://colab.research.google.com/drive/1h7tLkUp5yOKkKi2C4Kb4VR_VSStb8Fx8?usp=sharing
 
+Plot the data in experiment: https://colab.research.google.com/drive/1ZNYUKgbTARTiLv7_ywiiN4Us5PJxBbiQ?usp=sharing
+
 
 
 ## Histogram of data
@@ -34,7 +36,7 @@ Tested with sonotypes with highest k number of data
 
 | Classes | validation number | Accuracy |
 | :------ | ----------------- | -------- |
-| 2       | 9                 | 0.8889   |
+| 2       | 9                 | 88.89    |
 | 3       | 13                | 76.92    |
 | 4       | 18                | 44.44    |
 | 5       | 22                | 40.91    |
@@ -143,8 +145,33 @@ Repeat: model is easy to overfit the training data. The val_loss goes high after
 60 loss: 17.2051 - accuracy: 0.9568 - val_loss: 49.0847 - val_accuracy: 0.8333
 59 loss: 6.6145 - accuracy: 0.9560 - val_loss: 14.3925 - val_accuracy: 0.8889
 58 loss: 13.2819 - accuracy: 0.9679 - val_loss: 90.0838 - val_accuracy: 0.8333
-57 
+57 loss: 27.7378 - accuracy: 0.9346 - val_loss: 94.7842 - val_accuracy: 0.8333
 
+17 for validation
+56 loss: 16.4154 - accuracy: 0.9735 - val_loss: 72.0173 - val_accuracy: 0.8824
+55 loss: 9.4331 - accuracy: 0.9662 - val_loss: 169.8662 - val_accuracy: 0.8235
+54 loss: 1.1435 - accuracy: 0.9862 - val_loss: 10.7798 - val_accuracy: 0.8824
+
+16 for validation:
+53 loss: 37.3004 - accuracy: 0.9091 - val_loss: 136.6697 - val_accuracy: 0.8125
+52 loss: 6.8258 - accuracy: 0.9714 - val_loss: 16.6585 - val_accuracy: 0.8750
+51 loss: 6.7812 - accuracy: 0.9708 - val_loss: 44.0388 - val_accuracy: 0.8125
+
+15 for validation:
+50 loss: 23.2088 - accuracy: 0.9185 - val_loss: 110.8245 - val_accuracy: 0.8667
+49 loss: 15.3196 - accuracy: 0.9167 - val_loss: 3.3225 - val_accuracy: 0.8000
+48 loss: 36.4759 - accuracy: 0.9070 - val_loss: 110.8068 - val_accuracy: 0.8000
+47 loss: 14.3803 - accuracy: 0.9365 - val_loss: 151.4827 - val_accuracy: 0.8000
+
+14 for validation:
+46 loss: 22.1991 - accuracy: 0.9113 - val_loss: 16.4814 - val_accuracy: 0.7857
+loss: 20.9738 - accuracy: 0.9355 - val_loss: 24.9895 - val_accuracy: 0.9286
+45 loss: 27.7414 - accuracy: 0.9339 - val_loss: 46.1671 - val_accuracy: 0.7857
+44 loss: 64.6826 - accuracy: 0.7966 - val_loss: 92.1280 - val_accuracy: 0.7857
+
+13 for validation:
+43 loss: 51.2820 - accuracy: 0.9224 - val_loss: 49.5596 - val_accuracy: 0.8462
+42 loss: 16.3885 - accuracy: 0.9381 - val_loss: 19.8637 - val_accuracy: 0.9231
 
 
 
@@ -242,7 +269,7 @@ Test 30 more epoch when achieve a higher val_accuracy or the val_loss keeps decr
 ​	? loss: 0.0788 - accuracy: 0.9541 - val_loss: 0.0511 - val_accuracy: 1.0000
 
 12 for validation
-60 loss: 0.0189 - accuracy: 0.9907 - val_loss: 0.6076 - val_accuracy: 0.8333
+60 loss: 0.0189 - accuracy: 0.9907 - val_loss: 0.6076 - val_accuracy: 0.9167
 59  loss: 0.0786 - accuracy: 0.9811 - val_loss: 0.6464 - val_accuracy: 0.8333
 	loss: 0.1140 - accuracy: 0.9717 - val_loss: 0.7146 - val_accuracy: 0.9167
 58 loss: 0.1258 - accuracy: 0.9615 - val_loss: 0.2798 - val_accuracy: 0.8333
@@ -304,6 +331,8 @@ Test 30 more epoch when achieve a higher val_accuracy or the val_loss keeps decr
 	loss: 0.0452 - accuracy: 1.0000 - val_loss: 4.7361 - val_accuracy: 0.6667
 	2 random choices with 0.3333 val_accuracy, 1 with 0.6667
 13 loss: 0.0200 - accuracy: 1.0000 - val_loss: 0.8217 - val_accuracy: 0.6667
+12 loss: 0.2686 - accuracy: 0.9221 - val_loss: 0.9951 - val_accuracy: 0.6667
+11 loss: 0.1728 - accuracy: 0.9511 - val_loss: 0.7511 - val_accuracy: 0.6667
 
 ### Only birds
 

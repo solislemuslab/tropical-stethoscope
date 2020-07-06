@@ -10,7 +10,7 @@ Dataset creation: https://colab.research.google.com/drive/1h7tLkUp5yOKkKi2C4Kb4V
 
 Plot the data in experiment: https://colab.research.google.com/drive/1ZNYUKgbTARTiLv7_ywiiN4Us5PJxBbiQ?usp=sharing
 
-
+All the files related https://drive.google.com/drive/folders/1Vq79XmTKh8uoigtN_NBIFbPziibCa6sw?usp=sharing
 
 ## Histogram of data
 
@@ -37,7 +37,7 @@ Tested with sonotypes with highest k number of data
 | Classes | validation number | Accuracy |
 | :------ | ----------------- | -------- |
 | 2       | 9                 | 88.89    |
-| 3       | 13                | 76.92    |
+| 3       | 13                | 84.62    |
 | 4       | 18                | 44.44    |
 | 5       | 22                | 40.91    |
 | 6       | 28                | 30.77    |
@@ -85,6 +85,8 @@ Pick the 3 classes (52,138,463) that have high accuracy (92%). Say that these cl
 
 Need to repeat for many times till get the random data good enough to reach the high accuracy starting from 80 data
 Repeat: model is easy to overfit the training data. The val_loss goes high after a few epoches.
+
+**Confusing Output for experiement with 3 sonotypes**
 
 ![accurancy_different_sample_size](imgs/accurancy_different_sample_size.png)
 
@@ -173,7 +175,58 @@ loss: 20.9738 - accuracy: 0.9355 - val_loss: 24.9895 - val_accuracy: 0.9286
 43 loss: 51.2820 - accuracy: 0.9224 - val_loss: 49.5596 - val_accuracy: 0.8462
 42 loss: 16.3885 - accuracy: 0.9381 - val_loss: 19.8637 - val_accuracy: 0.9231
 
+Use new data here, 0704
+41 loss: 35.9602 - accuracy: 0.9091 - val_loss: 110.1232 - val_accuracy: 0.8462
 
+12 for validation:
+40 loss: 27.9112 - accuracy: 0.9444 - val_loss: 117.3980 - val_accuracy: 0.8333
+39 loss: 33.3975 - accuracy: 0.9048 - val_loss: 240.2001 - val_accuracy: 0.7500
+38 loss: 19.8958 - accuracy: 0.9412 - val_loss: 203.7515 - val_accuracy: 0.7500
+37 loss: 20.7447 - accuracy: 0.8889 - val_loss: 356.1734 - val_accuracy: 0.7500
+
+11 for valdiation:
+36 loss: 28.5276 - accuracy: 0.9381 - val_loss: 17.5038 - val_accuracy: 0.9091
+35 loss: 36.6981 - accuracy: 0.9149 - val_loss: 60.5284 - val_accuracy: 0.7273
+34 loss: 49.4386 - accuracy: 0.8791 - val_loss: 22.6517 - val_accuracy: 0.8182
+
+10 for validation
+33 loss: 24.4478 - accuracy: 0.9438 - val_loss: 12.7189 - val_accuracy: 0.9000
+32 loss: 8.3928 - accuracy: 0.9884 - val_loss: 93.5075 - val_accuracy: 0.8000
+31 loss: 51.4474 - accuracy: 0.8795 - val_loss: 16.3224 - val_accuracy: 0.8000
+
+9 for validation
+30 loss: 22.1698 - accuracy: 0.9383 - val_loss: 311.5831 - val_accuracy: 0.7778
+29 loss: 7.9678 - accuracy: 0.9744 - val_loss: 71.7775 - val_accuracy: 0.7778
+28 loss: 39.2691 - accuracy: 0.9467 - val_loss: 1.5583 - val_accuracy: 0.8889
+27 loss: 8.4804 - accuracy: 0.9306 - val_loss: 312.5359 - val_accuracy: 0.7778
+
+8 for validation
+26 loss: 11.7426 - accuracy: 0.9286 - val_loss: 24.7773 - val_accuracy: 0.8750
+25 loss: 9.5927 - accuracy: 0.9701 - val_loss: 142.4352 - val_accuracy: 0.7500
+24 loss: 7.5424 - accuracy: 0.9688 - val_loss: 0.0000e+00 - val_accuracy: 1.0000
+	loss: 84.5694 - accuracy: 0.9062 - val_loss: 122.5415 - val_accuracy: 0.7500
+
+7 for validation
+23 loss: 25.2479 - accuracy: 0.8871 - val_loss: 258.7693 - val_accuracy: 0.7143
+22 loss: 125.9889 - accuracy: 0.7966 - val_loss: 357.3232 - val_accuracy: 0.7143
+21 loss: 28.5093 - accuracy: 0.9464 - val_loss: 0.0000e+00 - val_accuracy: 1.0000
+
+6 for validation
+20 loss: 6.5940 - accuracy: 0.9444 - val_loss: 0.0000e+00 - val_accuracy: 1.0000
+19 loss: 21.7211 - accuracy: 0.9216 - val_loss: 88.3708 - val_accuracy: 0.6667
+	loss: 19.8138 - accuracy: 0.9412 - val_loss: 0.0000e+00 - val_accuracy: 1.0000
+18 loss: 37.0743 - accuracy: 0.8958 - val_loss: 121.2487 - val_accuracy: 0.8333
+17 loss: 76.2844 - accuracy: 0.8444 - val_loss: 0.0000e+00 - val_accuracy: 1.0000
+
+5 for validation
+16 loss: 138.0969 - accuracy: 0.8372 - val_loss: 355.8138 - val_accuracy: 0.6000
+15 loss: 84.1833 - accuracy: 0.8250 - val_loss: 645.4538 - val_accuracy: 0.4000
+14 loss: 136.6876 - accuracy: 0.6757 - val_loss: 682.0084 - val_accuracy: 0.4000
+
+4 for validation
+13 loss: 126.8062 - accuracy: 0.7143 - val_loss: 88.3383 - val_accuracy: 0.5000
+12 loss: 261.5061 - accuracy: 0.5625 - val_loss: 258.3843 - val_accuracy: 0.7500
+11 loss: 32.6645 - accuracy: 0.8966 - val_loss: 161.4595 - val_accuracy: 0.7500
 
 #### 2 classes, 52 and 138
 
@@ -306,6 +359,7 @@ Test 30 more epoch when achieve a higher val_accuracy or the val_loss keeps decr
 
 8 for validation
 40 loss: 0.1569 - accuracy: 0.9722 - val_loss: 0.0523 - val_accuracy: 0.8750
+35 loss: 0.1891 - accuracy: 0.9722 - val_loss: 0.2215 - val_accuracy: 0.8750
 
 6 for validation
 30  loss: 0.1526 - accuracy: 0.9630 - val_loss: 0.1200 - val_accuracy: 0.8333

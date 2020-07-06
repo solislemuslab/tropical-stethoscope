@@ -82,6 +82,7 @@
 42 loss: 0.0325 - accuracy: 1.0000 - val_loss: 0.0720 - val_accuracy: 0.8889
 41 loss: 0.0254 - accuracy: 0.9863 - val_loss: 0.0475 - val_accuracy: 0.8889
 40 loss: 0.1569 - accuracy: 0.9722 - val_loss: 0.0523 - val_accuracy: 0.8750
+35 loss: 0.1891 - accuracy: 0.9722 - val_loss: 0.2215 - val_accuracy: 0.8750
 30 loss: 0.1526 - accuracy: 0.9630 - val_loss: 0.1200 - val_accuracy: 0.8333
 25 loss: 0.0954 - accuracy: 0.9556 - val_loss: 0.2874 - val_accuracy: 0.8000
 24 loss: 0.0026 - accuracy: 1.0000 - val_loss: 1.5397 - val_accuracy: 0.8000

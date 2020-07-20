@@ -93,7 +93,7 @@ Repeat: model is easy to overfit the training data. The val_loss goes high after
 #### 3 classes, 52, 138, 463
 
 28 data for validation
-91 loss: 0.0150 - accuracy: 0.9948 - val_loss: 0.0819 - val_accuracy: 0.9792
+91 loss: 0.0150 - accuracy: 0.9948 - val_loss: 0.0819 - val_accuracy: 0.9642
 
 27 for validation
 90 loss: 0.0516 - accuracy: 0.9918 - val_loss: 0.2503 - val_accuracy: 0.9529

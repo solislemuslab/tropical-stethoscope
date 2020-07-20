@@ -90,6 +90,8 @@ Repeat: model is easy to overfit the training data. The val_loss goes high after
 
 ![accurancy_different_sample_size](imgs/accurancy_different_sample_size.png)
 
+![accurancy_different_sample_size](imgs/accurancy_different_sample_size_repeat_10.png)
+
 #### 3 classes, 52, 138, 463
 
 28 data for validation

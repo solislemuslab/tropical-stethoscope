@@ -10,7 +10,7 @@ Dataset creation: https://colab.research.google.com/drive/1h7tLkUp5yOKkKi2C4Kb4V
 
 Plot the data in experiment: https://colab.research.google.com/drive/1ZNYUKgbTARTiLv7_ywiiN4Us5PJxBbiQ?usp=sharing
 
-All the files related https://drive.google.com/drive/folders/1Vq79XmTKh8uoigtN_NBIFbPziibCa6sw?usp=sharing
+
 
 ## Histogram of data
 

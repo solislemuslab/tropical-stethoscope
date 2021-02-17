@@ -1,0 +1,23 @@
+universe = vanilla
+log = output/classification_8_$(Cluster)_$(Process).log
+error = output/classification_8_$(Cluster)_$(Process).err
+
+executable = classification_conda.sh
+arguments = $(Process)
+output = output/classification_8_$(Cluster)_$(Process).out
+
+should_transfer_files = YES
+when_to_transfer_output = ON_EXIT
+transfer_input_files = environment.yml, classification_with_augmentation.py 
+
+Requirements = (Target.HasCHTCStaging == true) && (CUDADriverVersion >= 10.0)
+
+# GPU
+request_gpus = 1
++WantGPULab = true
+request_cpus = 1
+request_memory = 20GB
+request_disk = 20GB
++GPUJobLength = "medium" 
+
+queue 50

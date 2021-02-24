@@ -1,0 +1,39 @@
+Reading the data:
+
+```{r}
+dat = read.table("data/classification_random_6_Feb10.csv", header=FALSE, sep=",")
+str(dat)
+```
+
+Creating the column for the min, mean of samples:
+```{r}
+dat$minsize = apply(dat[,7:12], 1, FUN=min)
+dat2 = within(dat, meansize <- (V7+V8+V9+V10+V11+V12)/6)
+
+summary(dat3)
+```
+
+Plotting:
+```{r}
+library(ggplot2)
+
+p <- ggplot(dat2, aes(x=minsize,y=V14, colour=meansize)) + geom_point() +
+  xlab("Minimum sample size") + ylab("Accuracy")+
+    scale_colour_gradient(low="white", high="blue")+
+        theme(
+        plot.title = element_text(hjust=0.5, size=rel(1.8)),
+        axis.title.x = element_text(size=rel(1.8)),
+        axis.title.y = element_text(size=rel(1.8), angle=90, vjust=0.5, hjust=0.5),
+        axis.text.x = element_text(colour="grey", size=rel(1.5), angle=0, hjust=.5, vjust=.5, face="plain"),
+        axis.text.y = element_text(colour="grey", size=rel(1.5), angle=90, hjust=.5, vjust=.5, face="plain"),
+        legend.text=element_text(size=rel(1.2)), legend.title=element_text(size=rel(1.5)),
+        panel.background = element_blank(),
+        axis.line = element_line(colour = "grey"),
+#        legend.position="none"
+        )
+p
+
+pdf("acc-by-min.pdf")
+p
+dev.off()
+```

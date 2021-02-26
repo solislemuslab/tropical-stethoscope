@@ -1,0 +1,113 @@
+Reading the data:
+
+```{r}
+dat = read.table("data/classification_random_6_Feb10.csv", header=FALSE, sep=",")
+str(dat)
+```
+
+Creating the column for the min, mean of samples:
+```{r}
+dat$minsize = apply(dat[,7:12], 1, FUN=min)
+dat$minsono = apply(dat[,1:6], 1, FUN=min)
+dat$maxsono = apply(dat[,1:6], 1, FUN=max)
+dat2 = within(dat, meansize <- (V7+V8+V9+V10+V11+V12)/6)
+
+summary(dat2)
+```
+
+Plotting:
+```{r}
+library(ggplot2)
+
+p <- ggplot(dat2, aes(x=minsize,y=V14, colour=meansize)) + geom_point() +
+  xlab("Minimum sample size") + ylab("Accuracy")+
+    scale_colour_gradient(low="white", high="blue")+
+        theme(
+        plot.title = element_text(hjust=0.5, size=rel(1.8)),
+        axis.title.x = element_text(size=rel(1.8)),
+        axis.title.y = element_text(size=rel(1.8), angle=90, vjust=0.5, hjust=0.5),
+        axis.text.x = element_text(colour="grey", size=rel(1.5), angle=0, hjust=.5, vjust=.5, face="plain"),
+        axis.text.y = element_text(colour="grey", size=rel(1.5), angle=90, hjust=.5, vjust=.5, face="plain"),
+        legend.text=element_text(size=rel(1.2)), legend.title=element_text(size=rel(1.5)),
+        panel.background = element_blank(),
+        axis.line = element_line(colour = "grey"),
+#        legend.position="none"
+        )
+p
+
+pdf("acc-by-min.pdf")
+p
+dev.off()
+
+
+p2 <- ggplot(dat2, aes(x=minsize,y=V14, colour=factor(minsono))) + geom_point() +
+  xlab("Minimum sample size") + ylab("Accuracy")+
+#    scale_colour_gradient(low="white", high="blue")+
+        theme(
+        plot.title = element_text(hjust=0.5, size=rel(1.8)),
+        axis.title.x = element_text(size=rel(1.8)),
+        axis.title.y = element_text(size=rel(1.8), angle=90, vjust=0.5, hjust=0.5),
+        axis.text.x = element_text(colour="grey", size=rel(1.5), angle=0, hjust=.5, vjust=.5, face="plain"),
+        axis.text.y = element_text(colour="grey", size=rel(1.5), angle=90, hjust=.5, vjust=.5, face="plain"),
+        legend.text=element_text(size=rel(1.2)), legend.title=element_text(size=rel(1.5)),
+        panel.background = element_blank(),
+        axis.line = element_line(colour = "grey"),
+#        legend.position="none"
+        )
+p2
+
+p3 <- ggplot(dat2, aes(x=minsize,y=V14, colour=factor(maxsono))) + geom_point() +
+  xlab("Minimum sample size") + ylab("Accuracy")+
+#    scale_colour_gradient(low="white", high="blue")+
+        theme(
+        plot.title = element_text(hjust=0.5, size=rel(1.8)),
+        axis.title.x = element_text(size=rel(1.8)),
+        axis.title.y = element_text(size=rel(1.8), angle=90, vjust=0.5, hjust=0.5),
+        axis.text.x = element_text(colour="grey", size=rel(1.5), angle=0, hjust=.5, vjust=.5, face="plain"),
+        axis.text.y = element_text(colour="grey", size=rel(1.5), angle=90, hjust=.5, vjust=.5, face="plain"),
+        legend.text=element_text(size=rel(1.2)), legend.title=element_text(size=rel(1.5)),
+        panel.background = element_blank(),
+        axis.line = element_line(colour = "grey"),
+#        legend.position="none"
+        )
+p3
+
+pdf("acc-by-min-minsono.pdf")
+p2
+dev.off()
+
+pdf("acc-by-min-maxsono.pdf")
+p3
+dev.off()
+```
+
+Finding patterns on data. It seems that three out of 4 bad accuracy test have 208
+```{r}
+dat2[dat2$V14<0.5,]
+dat2[dat2$V14<0.5,1:6]
+
+ind = (dat2$V1==208) | (dat2$V2==208) | (dat2$V3==208) | (dat2$V4==208) | (dat2$V5==208) | (dat2$V6==208)
+
+dat2$is208 = FALSE
+dat2$is208[ind] = TRUE
+
+str(dat2)
+
+p4 <- ggplot(dat2, aes(x=minsize,y=V14, colour=is208)) + geom_point() +
+  xlab("Minimum sample size") + ylab("Accuracy")+
+        theme(
+        plot.title = element_text(hjust=0.5, size=rel(1.8)),
+        axis.title.x = element_text(size=rel(1.8)),
+        axis.title.y = element_text(size=rel(1.8), angle=90, vjust=0.5, hjust=0.5),
+        axis.text.x = element_text(colour="grey", size=rel(1.5), angle=0, hjust=.5, vjust=.5, face="plain"),
+        axis.text.y = element_text(colour="grey", size=rel(1.5), angle=90, hjust=.5, vjust=.5, face="plain"),
+        legend.text=element_text(size=rel(1.2)), legend.title=element_text(size=rel(1.5)),
+        panel.background = element_blank(),
+        axis.line = element_line(colour = "grey")
+        )
+p4
+
+pdf("acc-by-min-208.pdf")
+p4
+dev.off()
+```

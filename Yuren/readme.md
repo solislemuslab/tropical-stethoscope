@@ -8,6 +8,8 @@ classification.ipynb: the notebook for the classification model without augmenta
 
 classification_with_augmentation.ipynb: the notebook for classifiaction model with augmentation functions.
 
+figures.ipynb: the notebook for plotting the figures
+
 ### Python files:
 
 classification_with_augmentation.py: the file that run on the condor for the experiment to randomly select sonotypes, augment, trian, and check classification performance.

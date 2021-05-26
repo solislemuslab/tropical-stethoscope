@@ -11,7 +11,7 @@ conda install conda
 conda env create -f environment.yml
 source activate tf-gpu
 
-# run your script
+# run the script
 cp /staging/ysun299/whole_data_1110.hdf5 ./
 python3 experiment_aug_no_aug.py
 rm whole_data_1110.hdf5

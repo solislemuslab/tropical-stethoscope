@@ -1,15 +1,14 @@
-''''
-This is the script to run on condor
-It randomly picked a given number of sonotypes 
-with sample sizesabove a given number. 
-Then, augment the samples to 250 per sonotype, train, 
-and check performance. 
+'''
+This is the script to randomly picked a given number of sonotypes
+with sample sizesabove a given number.
+Then, augment the samples to 250 per sonotype, train,
+and check performance.
 
 As the script is to be run on the server with parallel computing,
 we print the output instead of saving it to specific file
 
-Last updated: 02/17/2021 by Yuren Sun
-''''
+Last updated: 05/26/2021 by Yuren Sun
+'''
 
 
 # %tensorflow_version 1.x
@@ -33,26 +32,29 @@ import tensorflow as tf
 def normalize(specs):
     '''
     Linear normalization of the data
-    @param: specs the spcetrograms to normalize
-    @param: return_specs, the normalized spectrograms
+    @param: specs is the list of spcetrograms to normalize
+    @return: the normalized spectrograms
     '''
     return_specs = []
     for i in range(len(specs)):
+        # make a copy to ensure not changing the original spectrogram
         cur_spec = np.copy(specs[i])
         s_min = np.amin(cur_spec)
         s_max = np.amax(cur_spec)
-        # specs[i] = (cur_spec - s_min)/(s_max - s_min) * 255
-        return_specs.append((cur_spec - s_min)/(s_max - s_min))
-        # return_specs.append( np.log( (cur_spec - s_min)/(s_max - s_min) ) )
+        return_specs.append((cur_spec - s_min)/(s_max - s_min) * 255)
 
     return return_specs
 
+
 # Augmention functions
+# for each function, make a copy of the original spectrogram
+# to ensure that we do not change the original one
+# return all the augmented spectrograms in lists for consistency
 
 
 def time_chop(spec, rand_start):
     '''
-    chop the spectrogram on x axis (time)
+    chop the spectrogram on x axis (time) from the right
     @param: spec, the spectrogram to chop
     @param: rand_start: the randomed index to start chopping
     @return: the list of augmented spectrograms
@@ -65,7 +67,7 @@ def time_chop(spec, rand_start):
 
 def freq_chop(spec, rand_start):
     '''
-    chop the spectrogram on y axis (frequency)
+    chop the spectrogram on y axis (frequency) from the top
     @param: spec, the spectrogram to chop
     @param: rand_start: the randomed index to start chopping
     @return: the list of augmented spectrograms
@@ -96,7 +98,7 @@ def four_chop(spec, rand_start):
 def add_noises(spec):
     '''
     add noise to the spectrogram with 1/3 ratio
-    @param: spec, the spectrogram to chop    
+    @param: spec, the spectrogram to chop
     @return: the list of augmented spectrograms
     '''
     # add noise from light rian -2, rain -3, heavy rain -4, thunder -5, aircraft -6, chainsaw -7, and car/truck -8
@@ -106,10 +108,11 @@ def add_noises(spec):
     for i in range(len(noise_sonos)):
         noises_index = np.argwhere(sonotypes_h5 == noise_sonos[i]).flatten()
         noises = specs_h5[noises_index]
+        # randomly pick a noise sample
         index = random.randint(0, len(noises) - 1)
+        # normalize sound and noise, add them together with 1/3 ratio
         noise = normalize(np.array(noises[index]) / 3)
-
-        return_specs.append(np.add(normalize([spec])[0], noise))
+        return_specs.append(np.add(normalize([np.copy(spec)])[0], noise))
 
     return return_specs
 
@@ -117,13 +120,13 @@ def add_noises(spec):
 def translate(spec, roll_start):
     '''
     roll the spectrogram up and down
-    @param: spec, the spectrogram to chop   
-    @param: roll_start, the index to start rolling 
+    @param: spec, the spectrogram to chop
+    @param: roll_start, the index to start rolling
     @return: the list of augmented spectrograms
-    '''   
+    '''
     return_specs = []
-    return_specs.append(np.roll(spec, -roll_start, axis=0))
-    return_specs.append(np.roll(spec, roll_start, axis=0))
+    return_specs.append(np.roll(np.copy(spec), -roll_start, axis=0))
+    return_specs.append(np.roll(np.copy(spec), roll_start, axis=0))
 
     return return_specs
 
@@ -131,15 +134,15 @@ def translate(spec, roll_start):
 def widen(spec, widen_index):
     '''
     widen the spectrogram
-    @param: spec, the spectrogram to chop    
-    @param: widen_index, the index to decide the start and end of 
+    @param: spec, the spectrogram to chop
+    @param: widen_index, the index to decide the start and end of
             the spectrogram to widen
     @return: the list of augmented spectrograms
     '''
     return_specs = []
-    widen_time_spec = cv2.resize(spec.astype(
+    widen_time_spec = cv2.resize(np.copy(spec).astype(
         'float32'), (224 + widen_index, 224))
-    widen_freq_spec = cv2.resize(spec.astype(
+    widen_freq_spec = cv2.resize(np.copy(spec).astype(
         'float32'), (224, 224 + widen_index))
 
     return_specs.append(
@@ -150,15 +153,15 @@ def widen(spec, widen_index):
     return return_specs
 
 
-def squeeze(spec, squeeze_index):    
+def squeeze(spec, squeeze_index):
     '''
     squeeze the spectrogram
-    @param: spec, the spectrogram to chop    
-    @param: widen_index, the index to decide the start and end of 
+    @param: spec, the spectrogram to chop
+    @param: widen_index, the index to decide the start and end of
             the spectrogram to widen
     @return: the list of augmented spectrograms
     '''
-    squeezed = cv2.resize(spec.astype('float32'),
+    squeezed = cv2.resize(np.copy(spec).astype('float32'),
                           (224 - squeeze_index, 224 - squeeze_index))
     squeeze_spec = np.zeros([224, 224, 3])
     squeeze_spec[squeeze_index//2: - squeeze_index // 2,
@@ -168,44 +171,45 @@ def squeeze(spec, squeeze_index):
 
 
 def augment(specs, aux_input, sonotypes, aug_num, augment_range=0.1):
-    ''''
+    '''
     call all the augment methods on the spectrograms
 
     @param: specs is the list of spectrograms to augment from
     @param: aux_input is the list of auxiliary input corresponds to the spectrograms
     @param: sonotypes is the list of sonnotypes corresponds to the spectrograms
-    @param: aug_num is the number of sets of augmented spectrograms 
-            (returned number of samples will be 16*aug_num)
+    @param: aug_num is the number of sets of augmented spectrograms
+            (returned number of samples will be 15*aug_num)
     @param: augment_range is the threshold used for augmentations, default to 0.1
     @return: augment_specs_func is the list of augmented spectrograms
     @return: augment_aux_func is the list of  auxiliary input corresponds to the spectrograms
     @return: augment_sono_func is the list of sonotypes input corresponds to the spectrograms
-    ''''
-    # augment_range = 0.1
+    '''
+
+    # lists to return
     augment_specs_func = []
     augment_aux_func = []
     augment_sono_func = []
 
-    # print(len(aux_input))
+    # augment each spec and add to list
     for i in range(len(specs)):
-        # generate random index array for augmentation
-        indices = np.arange(int(224 * augment_range / 3 * 2),
+        # generate random non-repeated index array for augmentation,
+        # in 5% to 10% of the size of the original spectrogram
+        # 224 * 224 is the image size
+        indices = np.arange(int(224 * augment_range / 2),
                             int(224 * augment_range))
         np.random.shuffle(indices)
         indices = indices[:aug_num]
 
-        # augment each spec and add to list
         cur_spec = np.copy(specs[i])
-        # add itself to the list
-        if (len(augment_specs_func)):
-            augment_specs_func = np.append(
-                augment_specs_func, [cur_spec], axis=0)
-        else:
-            augment_specs_func.append(cur_spec)
-        # augment_specs_func.append(cur_spec)
+        # # add itself to the list, not added in this file
+        # if (len(augment_specs_func)):
+        #     augment_specs_func = np.append(
+        #         augment_specs_func, [cur_spec], axis=0)
+        # else:
+        #     augment_specs_func.append(cur_spec)
+        # # augment_specs_func.append(cur_spec)
 
         for index in indices:
-            # print(index)
             # chop
             augment_specs_func = np.append(
                 augment_specs_func, time_chop(np.copy(cur_spec), index), axis=0)
@@ -228,16 +232,16 @@ def augment(specs, aux_input, sonotypes, aug_num, augment_range=0.1):
             augment_specs_func = np.append(
                 augment_specs_func, translate(np.copy(cur_spec), index), axis=0)
 
-        # total 1 + 15 * aug_num augmented, repeat the sono and aux
+        # total 15 * aug_num augmented, repeat the sono and aux
         if (len(augment_aux_func)):
             augment_aux_func = np.append(augment_aux_func, np.repeat(
-                [aux_input[i]], 1 + 15 * aug_num, axis=0), axis=0)
+                [aux_input[i]], 15 * aug_num, axis=0), axis=0)
         else:
             augment_aux_func = np.repeat(
-                [aux_input[i]], 1 + 15 * aug_num, axis=0)
+                [aux_input[i]], 15 * aug_num, axis=0)
 
         augment_sono_func = np.append(augment_sono_func, np.repeat(
-            sonotypes[i], 1 + 15 * aug_num), axis=0)
+            sonotypes[i], 15 * aug_num), axis=0)
 
     return augment_specs_func, augment_aux_func, augment_sono_func
 
@@ -259,15 +263,19 @@ def get_samples(numUsed, min_type):
     @return: cat_y_test, the catgorical output for test
     @return: cat_y_val, the catgorical output for validation
     '''
+
     # get groups
     aug_goal = 250
+    # randomly pick sonotype with sample size > min_type
+    # and are not noises (sonotype > 0)
     type_index = np.argwhere((s_freq_desc >= min_type) & (
         s_unique[s_freq_order] > 0)).flatten()
     random.shuffle(type_index)
     type_index = np.sort(type_index[:numUsed])
-    max_num = s_freq_desc[np.min(type_index)]
     typeUsed = s_unique[s_freq_order][type_index]
 
+    # print some stats
+    max_num = s_freq_desc[np.min(type_index)]  # the maximum sample size
     print("type index:", type_index)
     print("type used: ", typeUsed)
     print("max num: ", max_num)
@@ -283,49 +291,46 @@ def get_samples(numUsed, min_type):
     y_val = []
     sizes = []
 
+    # use i for sonotype number during training and testing
     for i in range(len(typeUsed)):
         # get index of the current type of spec
         cur_index = np.argwhere(sonotypes_h5 == typeUsed[i]).flatten()
         random.shuffle(cur_index)
         sizes.append(len(cur_index))
 
-        # decide the text and val size
+        # decide the text and val size,
+        # split in train: validation: test = 80%:10%:10%
         # at least 1 for both test and val
         text_val_size = max(1, int(len(cur_index) * 0.1))
         cur_index_resized = cur_index[:len(cur_index) - 2 * text_val_size]
         test_index = cur_index[len(cur_index) - 2 *
                                text_val_size: len(cur_index) - text_val_size]
         val_index = cur_index[len(cur_index) - text_val_size: len(cur_index)]
+
+        # print some stats
         print("sonotype, len of cur:", typeUsed[i], len(cur_index))
         print("train, test, val size: ", len(cur_index_resized),
               len(test_index), len(val_index))
 
-        # augment to aug goal
-        # train
-        if len(cur_index_resized) > 20:
-            augment_specs, augment_aux, augment_sono = augment(
-                specs_h5[cur_index_resized][:20], aux_input_h5[cur_index_resized][:20], np.repeat(i, 20), 1)
-        else:
-            augment_num = (int(aug_goal * 0.8) //
-                           len(cur_index_resized)) // 16 + 1
-            # train
-            augment_specs, augment_aux, augment_sono = augment(
-                specs_h5[cur_index_resized], aux_input_h5[cur_index_resized], np.repeat(i, len(cur_index_resized)), augment_num)
+        # augment to aug goal separatedly for training, validation, and testing sets
+        # train， 80% of aug goal, each augmentation pass augment the sample to another 15 sampls
+        augment_num = (int(aug_goal * 0.8) // len(cur_index_resized)) // 15 + 1
+        augment_specs, augment_aux, augment_sono = augment(
+            specs_h5[cur_index_resized], aux_input_h5[cur_index_resized], np.repeat(i, len(cur_index_resized)), augment_num)
 
         # first in augmented set is itself
         aug_index = np.arange(2, len(augment_specs))
         random.shuffle(aug_index)
         aug_index = aug_index[:int(aug_goal * 0.8) - len(cur_index_resized)]
-        print("test aug size", len(aug_index))
 
-        if len(specs): # added before
+        if len(specs):  # added before
             specs = np.concatenate(
                 (specs, specs_h5[cur_index_resized], augment_specs[aug_index]), axis=0)
             aux_input = np.concatenate(
                 (aux_input, aux_input_h5[cur_index_resized], augment_aux[aug_index]), axis=0)
             sonotypes = np.append(sonotypes, np.repeat(
                 i, len(cur_index_resized) + len(aug_index)))
-        else: # first time to add
+        else:  # first time to add
             specs = np.concatenate(
                 (specs_h5[cur_index_resized], augment_specs[aug_index]), axis=0)
             aux_input = np.concatenate(
@@ -334,6 +339,7 @@ def get_samples(numUsed, min_type):
 
         # test and val
         augment_num = (int(aug_goal * 0.1) // text_val_size) // 16 + 1
+
         # test
         augment_specs, augment_aux, augment_sono = None, None, None
         augment_specs, augment_aux, augment_sono = augment(
@@ -341,7 +347,7 @@ def get_samples(numUsed, min_type):
         aug_index = np.arange(2, len(augment_specs))
         random.shuffle(aug_index)
         aug_index = aug_index[:int(aug_goal * 0.1) - text_val_size]
-        print("test aug size", len(aug_index))
+        # print("test aug size", len(aug_index))
 
         if len(spec_test):  # added before
             spec_test = np.concatenate(
@@ -350,7 +356,7 @@ def get_samples(numUsed, min_type):
                 (aux_test, aux_input_h5[test_index], augment_aux[aug_index]), axis=0)
             y_test = np.append(y_test, np.repeat(
                 i, len(test_index) + len(aug_index)))
-        else: # first time to add
+        else:  # first time to add
             spec_test = np.concatenate(
                 (specs_h5[test_index], augment_specs[aug_index]), axis=0)
             aux_test = np.concatenate(
@@ -379,11 +385,11 @@ def get_samples(numUsed, min_type):
                 (aux_input_h5[val_index], augment_aux[aug_index]), axis=0)
             y_val = np.repeat(i, len(val_index) + len(aug_index))
 
-        print()
-        print(specs.shape, len(aux_input), len(sonotypes), len(spec_test), len(
+        # print stats
+        print("\n", specs.shape, len(aux_input), len(sonotypes), len(spec_test), len(
             aux_test), len(y_test), len(spec_val), len(aux_val), len(y_val))
-        print()
 
+    # formulate the test and validation sets
     x_test = [spec_test, aux_test]
     x_val = [spec_val, aux_val]
     cat_y_test = to_categorical(pd.factorize(
@@ -398,10 +404,11 @@ def get_samples(numUsed, min_type):
 
 
 class TestCallback(keras.callbacks.Callback):
-    ''''
-    The class used to stop the training process early if the 
-    validation loss is 0
-    ''''
+    '''
+    The class used to test and check test stats
+    during the training process 
+    '''
+
     def __init__(self, test_data):
         self.test_data = test_data
 
@@ -409,40 +416,6 @@ class TestCallback(keras.callbacks.Callback):
         x, y = self.test_data
         loss, acc = self.model.evaluate(x, y, verbose=0)
         print('\nTesting loss: {}, acc: {}\n'.format(loss, acc))
-
-        # accuracy = logs["val_accuracy"]
-        if logs["val_accuracy"] >= 1 and logs["val_loss"] == 0:
-            self.model.stop_training = True
-
-
-def gen(specs, aux_input, sonotypes):
-      ''''
-    generator functiion for fit_generator
-    augment the samples and yield the augmented samples
-
-    @param: specs, the list of spectrograms
-    @param: aux_input, the list of auxiliary input corresponding to the spectrograms
-    @param: sonotypes, the list of sonotypes corresponding to the spectrograms
-    ''''
-    while 1:
-        # shuffle data
-        indices = np.arange(len(sonotypes))
-        np.random.shuffle(indices)
-        # # use 30 of all data per epoch
-        # indices = indices[:30]
-        step_len = 4
-
-        for i in range(len(specs) // step_len):
-            step_min = i * step_len
-            step_max = min((i + 1) * step_len, len(specs))
-
-            augment_specs, augment_aux, augment_sono = augment(
-                specs[indices][step_min: step_max], aux_input[indices][step_min: step_max], sonotypes[indices][step_min: step_max], 1)
-            augment_specs_normal = normalize(augment_specs)
-            cat_y_train = to_categorical(
-                augment_sono, num_classes=len(typeUsed))
-
-            yield {'input_1': np.array([augment_specs_normal])[0], 'aux_input': np.array([augment_aux])[0]}, np.array([cat_y_train])[0]
 
 
 def build_finetune_model(base_model, dropouts, fc_layers, num_classes):
@@ -452,31 +425,34 @@ def build_finetune_model(base_model, dropouts, fc_layers, num_classes):
     another input layer for auxiliary input 
     and concatenate it with the flatten layer
     '''
+    # fix the base layers
     for layer in base_model.layers:
         layer.trainable = False
 
+    # add flatten layer
     x = base_model.output
     x = Flatten()(x)
 
-    # add input layer
+    # add input layer for auxiliary frequency and time
     auxiliary_input = Input(shape=(4,), name='aux_input')
     x = concatenate([x, auxiliary_input])
 
+    # add dense and dropout layer at last
     for fc, drop in zip(fc_layers, dropouts):
         x = Dense(fc, activation='relu')(x)
         x = Dropout(drop)(x)
 
+    # final dense layer for output
     predictions = Dense(num_classes, activation='softmax')(x)
 
     finetune_model = Model(
         inputs=[base_model.input, auxiliary_input], outputs=predictions)
-    # finetune_model = Model(inputs=base_model.input, outputs=predictions)
 
     return finetune_model
 
 
 if __name__ == "__main__":
-    """Read the dataset"""
+    # Read the dataset
     f = h5py.File('whole_data_1110.hdf5', "r")
     specs_h5 = np.array(f["specs"]).astype("float32")
     sonotypes_h5 = np.array(f["sonotypes"]).astype("float32")
@@ -489,8 +465,8 @@ if __name__ == "__main__":
     # append x_times an x_freqs to be auxiliary_input
     aux_input_h5 = np.append(times_h5, freqs_h5, axis=1)
 
-    # create the dictionary for sonotypes and groups
-    sono2group = dict(zip(sonotypes_h5, groups_h5))
+    # # create the dictionary for sonotypes and groups, not used here
+    # sono2group = dict(zip(sonotypes_h5, groups_h5))
 
     # get the data for top k sonotypes
     s_unique, s_freq = np.unique(sonotypes_h5, return_counts=True)
@@ -504,22 +480,23 @@ if __name__ == "__main__":
         epochs=30,
     )
 
-    numUsed = 15
-    min_type = 3
+    numUsed = 6
+    min_type = 3  # the minimum sample size to use
     all_result = []
     all_result_no = []
     all_type_used = []
     all_result_print = []
+
     for i in range(10):
         print("\niteration: ", i)
         # clean from last session
         tf.keras.backend.clear_session()
         typeUsed, sizes, specs, aux_input, sonotypes, x_test, x_val, cat_y_test, cat_y_val = None, None, None, None, None, None, None, None, None
-        
+
         # get data
         typeUsed, sizes, specs, aux_input, sonotypes, x_test, x_val, cat_y_test, cat_y_val = get_samples(
             numUsed, min_type)
-            
+
         all_type_used.append(typeUsed)
         # print("all type used", all_type_used)
 
@@ -535,16 +512,18 @@ if __name__ == "__main__":
 
         # earlystopping, checkpoiint, before
         filepath = 'model_group.hdf5'
+        # stop after 15 epoches without reduction of validation loss
         earlystop = EarlyStopping(
             monitor='val_loss', mode='min', verbose=1, patience=15)
+        # save the model with lowest validation loss
         checkpoint = ModelCheckpoint(filepath, monitor='val_loss', verbose=1,
                                      save_best_only=True, save_weights_only=False, mode='auto', period=1)
         opt = Adam(lr=config["learn_rate"])
         model.compile(optimizer=opt, loss='categorical_crossentropy',
                       metrics=['accuracy'])
-        cat_y_train = to_categorical(sonotypes, num_classes=len(typeUsed))
 
         # training
+        cat_y_train = to_categorical(sonotypes, num_classes=len(typeUsed))
         history = model.fit(x=[specs, aux_input], y=cat_y_train, validation_data=(
             x_val, cat_y_val), epochs=300, verbose=0, callbacks=[checkpoint, earlystop, TestCallback((x_test, cat_y_test))])
 

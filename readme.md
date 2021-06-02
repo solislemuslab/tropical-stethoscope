@@ -8,7 +8,7 @@ The python scripts can be found in the `scripts` folder.
 
 
 ## License
-BioKlustering is licensed under the [MIT](https://opensource.org/licenses/MIT) licence. &copy; Burivalova-PimentelAlarcon-SolisLemus lab projects (2021)
+Our code is licensed under the [MIT](https://opensource.org/licenses/MIT) license. &copy; Burivalova-PimentelAlarcon-SolisLemus lab projects (2021)
 
 ## Citation
 If you use the code in your work, we kindly ask that you cite the following paper:

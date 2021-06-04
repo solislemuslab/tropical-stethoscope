@@ -352,8 +352,7 @@ def get_samples(numUsed, num_pick=49):
 
 class TestCallback(keras.callbacks.Callback):
     '''
-    The class used to stop the training process early if the
-    validation loss is 0
+    The class used to see the test result during training
     '''
 
     def __init__(self, test_data):

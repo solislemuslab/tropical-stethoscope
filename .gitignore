@@ -1,6 +1,7 @@
 # this project
 data
 resources
+example/.ipynb_checkpoints/*
 
 # Compiled source #
 ###################

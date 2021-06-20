@@ -2,21 +2,12 @@
 
 ## Data structure
 
-We provide a sample dataset to exemplify the steps to run the neural network model. The sample dataset could be found [here](https://drive.google.com/file/d/1kEW1FscJROzEVm3R8_1Yl4RyOw9K5_jL/view?usp=sharing) on Google Drive and is about 480mb in size.
-The sample dataset contains data on 6 birds (the classes that we want to classify with the neural network model) and noise data.
+We provide a sample dataset to exemplify the steps to run the neural network model. The sample dataset could be found [here](https://drive.google.com/file/d/101Mnahr0ZPVz1eFyBniNPNJ0NltlVhk6/view?usp=sharing) on Google Drive and is about 480mb in size. The sample dataset contains data on 6 birds (the classes that we want to classify with the neural network model) and noise data.
 
-[need to add here what was the structure of the files before they were converted to hdf5. We might want to add one example of how the data looks like before the hdf5 in the same shared drive.]
+We also provide an example containing our approach to create the create the hdf5 dataset, named "sample_dataset_creation.ipynb". The file will read and parse the "sample_labels.txt" file to retrieve info from to plot and chop the spectrogram to create the dataset. The labels file was created using Raven Pro 1.6 (please see methods in the publication). The wav file used in this example could be found [here](https://drive.google.com/file/d/1b0KzSFkvSakbIoQhLk9VHDX8Wi17d2xk/view?usp=sharing). 
+Note that the label and wav data in this example is different from the sample dataset provided above as the dataset is created with multiple label files and wav files, which would be too large to include in the example.
 
-You need to make sure to put your data in the same format which is a HDF5 format.
-
-To do so, you need to follow the following instructions:
-
-1. Make sure that your datafiles have this format [need details here, but I don't know thw raw format of the data]
-
-2. You will read your datafiles into python with the following commands: [add here] and then you will save as hdf5 with the following commands: [add here]
-
-
-The end result is a sample dataset stored in hdf5 format consisting of 5 unordered arrays (lists). Each element in each array are described below.
+The end result for "sample_labels.txt" is a sample dataset stored in hdf5 format consisting of 5 unordered arrays (lists). Each element in each array are described below.
 - image (spectrogram) of the sonotype with size 244 * 244 * 3 ( 3 channel 224 * 224 pixels image) as float. 
 - sonotype number as float
 - time range: 2 floats for start and end time
@@ -25,9 +16,18 @@ The end result is a sample dataset stored in hdf5 format consisting of 5 unorder
 
 The element at the same index in each array belongs to the same sample and the five arrays should have the same length, i.e, the nth image in image array, nth time range, nth frequency, and nth taxomic group represent the same sample of nth sonotype number.
 
+If you want to try out your own data to train the model, you need to make sure to put your data in the same format which is a HDF5 format to run the sample classification process.
+
+To do so, you need to follow the following instructions:
+
+1. Make sure that your labe file have similar format as the label file provided in this folder as well as corresponding wav files to plot the spectrograms.
+
+2. You will run the jupyter notebook file (maybe with some slight changes based on your data format) to create the labels as instructions in the below section
+
+
 ## Fitting the neural network model
 
-Once you have your data in the hdf5 format as described above, you need to follow the instructions in the `sample_classification_with_augmentation.ipynb` jupyter notebook. The training speed might differ in the laptop processers but should probably take less than 2 hours.
+Once you have your data in the hdf5 format as described above, you need to follow the instructions in the `sample_classification_with_augmentation.ipynb` jupyter notebook. The training speed might differ in the laptop processers but should probably take less than 3 hours.
 
 You need to follow the steps (mainly aimed at Mac or Linux users):
 
@@ -49,7 +49,13 @@ h5py
 pandas
 tensorflow-gpu==1.14.0
 tensorflow==1.14.0
+cudatoolkit=10.0
 keras==2.3.1
+```
+If you want to run the example to create the dataset, include the following lines in the requirement.txt:
+```
+scipy
+soundfile
 ```
 
 5. Run `JupyterLab` by typing `jupyter-lab` in the terminal. A browser page will be opened automatically where you will find the `sample_classification_with_augmentation.ipynb` jupyter notebook from the folder you just cloned.
@@ -57,7 +63,7 @@ keras==2.3.1
 6. Change the path in the 3rd code block (Read the dataset) to where you stored your hdf5 file and run all the code blocks.
 
 
-Note that one alternative to use `JupyterLab` is to use Google Colab, which is a online version for jupyter notebook. Instructions could be found [here](https://colab.research.google.com/). When using Colab, please remember to use the GPU run time, which could be found at Runtime > Change runtime type and select GPU as Hardware accelerator (otherwise, the training process might be extremely slow). Google Colab limit the resources that we can use for free, including the GPU, but the limited resources is enough for this example.
+Note that one alternative to use `JupyterLab` is to use Google Colab, which is a online version for jupyter notebook. Instructions could be found [here](https://colab.research.google.com/). When using Colab to fit the model, please remember to use the GPU run time when fitting the model, which could be found at Runtime > Change runtime type and select GPU as Hardware accelerator (otherwise, the training process might be extremely slow). Google Colab limit the resources that we can use for free, including the GPU, but the limited resources is enough for this example.
 
 
 

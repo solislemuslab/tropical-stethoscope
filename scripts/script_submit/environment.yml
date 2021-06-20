@@ -1,0 +1,13 @@
+name: tf-gpu
+channels:
+  - defaults
+dependencies:
+  - cudatoolkit=10.0
+  - python=3.6
+  - numpy
+  - tensorflow-gpu=1.14.0
+  - tensorflow=1.14.0
+  - keras=2.3.1
+  - opencv
+  - h5py
+  - pandas

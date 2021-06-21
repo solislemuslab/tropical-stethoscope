@@ -6,7 +6,7 @@ If you want to try out your own data to train the model, you need to make sure t
 
 To do so, you need to follow the following instructions:
 
-1. Make sure that your labe file have the same (or at least similar) format as `sample_labels.txt`. You also need corresponding wav files for recordings.
+1. Make sure that your label file have the same (or at least similar) format as `sample_labels.txt`. You also need corresponding wav files for recordings.
 
 2. You will run the `sample_dataset_creation.ipynb` jupyter notebook file maybe with some slight changes based on your data format, to create the labels. Details about this process could be found in the `Data structure` section below. To run this notebook file, you can follow the instructions in the `Instructions to create dataset and fit the neural network model` section.
 

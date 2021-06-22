@@ -15,7 +15,7 @@ Once you have your data in the hdf5 format as described above, you can follow th
 
 ## Data structure
 
-We provide an example jupyter notebook with our approach to create the create the hdf5 dataset, named `sample_dataset_creation.ipynb`. The file will read and parse the `sample_labels.txt` file to retrieve info from to plot and chop the spectrogram to create the dataset. The labels file was created using Raven Pro 1.6 (please see methods in the publication). The wav file used in this example could be found [here](https://drive.google.com/file/d/1b0KzSFkvSakbIoQhLk9VHDX8Wi17d2xk/view?usp=sharing). 
+We provide an example jupyter notebook with our approach to create the create the hdf5 dataset, named `sample_dataset_creation.ipynb`. The file will read and parse the `sample_labels.txt` file to retrieve info from to plot and chop the spectrogram to create the dataset. The labels file was created using Raven Pro 1.6 (please see methods in the publication). The wav file used in this example could be found [here](https://drive.google.com/file/d/1b0KzSFkvSakbIoQhLk9VHDX8Wi17d2xk/view?usp=sharing) (around 150mb). The expected output of the jupyter notebook from the label file and wav file could be found [here](https://drive.google.com/file/d/1IiNqZQEcxwT8BECapfM7bJS4Y9zmJUaw/view?usp=sharing).
 Note that the label and wav data in this example is different from the sample dataset provided above as the sample dataset is created with multiple label files and wav files, which are too large to include in the example.
 
 The end result for `sample_dataset_creation.ipynb` is a sample dataset stored in hdf5 format consisting of 5 arrays (lists). Each element in each array are described below.

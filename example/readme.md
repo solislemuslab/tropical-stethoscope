@@ -94,8 +94,3 @@ soundfile
 7. Once you have your data in the hdf5 format, you can open and follow the `sample_classification_with_augmentation.ipynb` jupyter notebook for the training process. Training time will depend on the size of your data.
 
 
-## Data structure
-
-
-
-

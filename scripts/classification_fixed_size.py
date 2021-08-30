@@ -1,13 +1,13 @@
 '''
-This is the script randomly picked a given number of sonotypes 
-with a fixed sample sizes. 
-Then, augment the samples to 250 per sonotype, train, 
-and check accuracy. 
+This is the script randomly picked a given number of sonotypes
+with a fixed sample sizes.
+Then, augment the samples to 250 per sonotype, train,
+and check accuracy.
 
 As the script is to be run on the server with parallel computing on condor,
 we print the output instead of saving it to specific file
 
-Last updated: 05/26/2021 by Yuren Sun 
+Last updated: 05/26/2021 by Yuren Sun
 '''
 
 
@@ -25,7 +25,7 @@ from keras.models import Model, load_model
 from keras.callbacks import EarlyStopping, ModelCheckpoint
 from keras.layers import Dense, Activation, Flatten, Dropout, Input, concatenate
 import cv2
-import csv
+from sklearn.metrics import roc_auc_score
 import tensorflow as tf
 
 
@@ -54,7 +54,7 @@ def normalize(specs):
 
 def time_chop(spec, rand_start):
     '''
-    chop the spectrogram on x axis (time) from the right 
+    chop the spectrogram on x axis (time) from the right
     @param: spec, the spectrogram to chop
     @param: rand_start: the randomed index to start chopping
     @return: the list of augmented spectrograms
@@ -98,7 +98,7 @@ def four_chop(spec, rand_start):
 def add_noises(spec):
     '''
     add noise to the spectrogram with 1/3 ratio
-    @param: spec, the spectrogram to chop    
+    @param: spec, the spectrogram to chop
     @return: the list of augmented spectrograms
     '''
     # add noise from light rian -2, rain -3, heavy rain -4, thunder -5, aircraft -6, chainsaw -7, and car/truck -8
@@ -120,8 +120,8 @@ def add_noises(spec):
 def translate(spec, roll_start):
     '''
     roll the spectrogram up and down
-    @param: spec, the spectrogram to chop   
-    @param: roll_start, the index to start rolling 
+    @param: spec, the spectrogram to chop
+    @param: roll_start, the index to start rolling
     @return: the list of augmented spectrograms
     '''
     return_specs = []
@@ -134,8 +134,8 @@ def translate(spec, roll_start):
 def widen(spec, widen_index):
     '''
     widen the spectrogram
-    @param: spec, the spectrogram to chop    
-    @param: widen_index, the index to decide the start and end of 
+    @param: spec, the spectrogram to chop
+    @param: widen_index, the index to decide the start and end of
             the spectrogram to widen
     @return: the list of augmented spectrograms
     '''
@@ -156,8 +156,8 @@ def widen(spec, widen_index):
 def squeeze(spec, squeeze_index):
     '''
     squeeze the spectrogram
-    @param: spec, the spectrogram to chop    
-    @param: widen_index, the index to decide the start and end of 
+    @param: spec, the spectrogram to chop
+    @param: widen_index, the index to decide the start and end of
             the spectrogram to widen
     @return: the list of augmented spectrograms
     '''
@@ -177,7 +177,7 @@ def augment(specs, aux_input, sonotypes, aug_num, augment_range=0.1):
     @param: specs is the list of spectrograms to augment from
     @param: aux_input is the list of auxiliary input corresponds to the spectrograms
     @param: sonotypes is the list of sonnotypes corresponds to the spectrograms
-    @param: aug_num is the number of sets of augmented spectrograms 
+    @param: aug_num is the number of sets of augmented spectrograms
             (returned number of samples will be 15*aug_num)
     @param: augment_range is the threshold used for augmentations, default to 0.1
     @return: augment_specs_func is the list of augmented spectrograms
@@ -246,13 +246,15 @@ def augment(specs, aux_input, sonotypes, aug_num, augment_range=0.1):
     return augment_specs_func, augment_aux_func, augment_sono_func
 
 
-def get_samples(numUsed, min_type):
+def get_samples(numUsed, min_type, fix_size):
     '''
     Get samples, augment to 250 samples per sonotypes
     return the separated sets for training, validatioon, and testing
 
     @param: numUsed, the number of sonotypes to use
     @param: min_type, the number of minimum_type
+    @param: fix_size True if use the same sample size for all sonotypes.
+                False otherwise.
     @return: typeUsed, the sonotypes ramdomly picked
     @return: sizes, the list of original sample sizes for the sonotypes
     @return: specs, the training spectrograms
@@ -263,7 +265,6 @@ def get_samples(numUsed, min_type):
     @return: cat_y_test, the catgorical output for test
     @return: cat_y_val, the catgorical output for validation
     '''
-    s
     # get groups
     aug_goal = 250
     # randomly pick sonotype with sample size > min_type
@@ -277,6 +278,7 @@ def get_samples(numUsed, min_type):
     print("type index:", type_index)
     print("type used: ", typeUsed)
 
+    # aug
     specs = []
     aux_input = []
     sonotypes = []
@@ -288,12 +290,25 @@ def get_samples(numUsed, min_type):
     y_val = []
     sizes = []
 
+    # no aug
+    specs_no = []
+    aux_input_no = []
+    sonotypes_no = []
+    spec_test_no = []
+    aux_test_no = []
+    y_test_no = []
+    spec_val_no = []
+    aux_val_no = []
+    y_val_no = []
+
+
     for i in range(len(typeUsed)):
         # get index of the current type of spec
         cur_index = np.argwhere(sonotypes_h5 == typeUsed[i]).flatten()
         random.shuffle(cur_index)
-        # fixed size, comment off next line if use the original size
-        cur_index = cur_index[:min_type]
+
+        if fix_size:
+            cur_index = cur_index[:min_type]
         sizes.append(len(cur_index))  # append the used size
 
         # decide the text and val size,
@@ -321,19 +336,30 @@ def get_samples(numUsed, min_type):
         aug_index = aug_index[:int(aug_goal * 0.8) - len(cur_index_resized)]
         print("test aug size", len(aug_index))
 
-        if len(specs):  # added before
+        if len(specs):
             specs = np.concatenate(
                 (specs, specs_h5[cur_index_resized], augment_specs[aug_index]), axis=0)
             aux_input = np.concatenate(
                 (aux_input, aux_input_h5[cur_index_resized], augment_aux[aug_index]), axis=0)
             sonotypes = np.append(sonotypes, np.repeat(
                 i, len(cur_index_resized) + len(aug_index)))
-        else:  # first time to add
+
+            specs_no = np.concatenate(
+                (specs_no, specs_h5[cur_index_resized]), axis=0)
+            aux_input_no = np.concatenate(
+                (aux_input_no, aux_input_h5[cur_index_resized]), axis=0)
+            sonotypes_no = np.append(sonotypes_no, np.repeat(
+                i, len(cur_index_resized)))
+        else:
             specs = np.concatenate(
                 (specs_h5[cur_index_resized], augment_specs[aug_index]), axis=0)
             aux_input = np.concatenate(
                 (aux_input_h5[cur_index_resized], augment_aux[aug_index]), axis=0)
             sonotypes = np.repeat(i, len(cur_index_resized) + len(aug_index))
+
+            specs_no = np.copy(specs_h5[cur_index_resized])
+            aux_input_no = np.copy(aux_input_h5[cur_index_resized])
+            sonotypes_no = np.repeat(i, len(cur_index_resized))
 
         # test and val
         augment_num = (int(aug_goal * 0.1) // text_val_size) // 15 + 1
@@ -346,19 +372,28 @@ def get_samples(numUsed, min_type):
         aug_index = aug_index[:int(aug_goal * 0.1) - text_val_size]
         print("test aug size", len(aug_index))
 
-        if len(spec_test):  # added before
+        if len(spec_test):
             spec_test = np.concatenate(
                 (spec_test, specs_h5[test_index], augment_specs[aug_index]), axis=0)
             aux_test = np.concatenate(
                 (aux_test, aux_input_h5[test_index], augment_aux[aug_index]), axis=0)
             y_test = np.append(y_test, np.repeat(
                 i, len(test_index) + len(aug_index)))
-        else:  # first time to add
+            spec_test_no = np.concatenate(
+                (spec_test_no, specs_h5[test_index]), axis=0)
+            aux_test_no = np.concatenate(
+                (aux_test_no, aux_input_h5[test_index]), axis=0)
+            y_test_no = np.append(y_test_no, np.repeat(i, len(test_index)))
+
+        else:
             spec_test = np.concatenate(
                 (specs_h5[test_index], augment_specs[aug_index]), axis=0)
             aux_test = np.concatenate(
                 (aux_input_h5[test_index], augment_aux[aug_index]), axis=0)
             y_test = np.repeat(i, len(test_index) + len(aug_index))
+            spec_test_no = np.copy(specs_h5[test_index])
+            aux_test_no = np.copy(aux_input_h5[test_index])
+            y_test_no = np.repeat(i, len(test_index))
 
         # val
         augment_specs, augment_aux, augment_sono = None, None, None
@@ -375,6 +410,12 @@ def get_samples(numUsed, min_type):
                 (aux_val, aux_input_h5[val_index], augment_aux[aug_index]), axis=0)
             y_val = np.append(y_val, np.repeat(
                 i, len(val_index) + len(aug_index)))
+
+            spec_val_no = np.concatenate(
+                (spec_val_no, specs_h5[val_index]), axis=0)
+            aux_val_no = np.concatenate(
+                (aux_val_no, aux_input_h5[val_index]), axis=0)
+            y_val_no = np.append(y_val_no, np.repeat(i, len(val_index)))
         else:
             spec_val = np.concatenate(
                 (specs_h5[val_index], augment_specs[aug_index]), axis=0)
@@ -382,10 +423,12 @@ def get_samples(numUsed, min_type):
                 (aux_input_h5[val_index], augment_aux[aug_index]), axis=0)
             y_val = np.repeat(i, len(val_index) + len(aug_index))
 
-        print()
+            spec_val_no = np.copy(specs_h5[val_index])
+            aux_val_no = np.copy(aux_input_h5[val_index])
+            y_val_no = np.repeat(i, len(val_index))
+
         print(specs.shape, len(aux_input), len(sonotypes), len(spec_test), len(
             aux_test), len(y_test), len(spec_val), len(aux_val), len(y_val))
-        print()
 
     x_test = [spec_test, aux_test]
     x_val = [spec_val, aux_val]
@@ -397,13 +440,14 @@ def get_samples(numUsed, min_type):
     print("train, test, val size:", specs.shape[0], len(
         cat_y_test), len(cat_y_val))
 
-    return typeUsed, sizes, specs, aux_input, sonotypes, x_test, x_val, cat_y_test, cat_y_val
+    return typeUsed, sizes, specs, aux_input, sonotypes, x_test, x_val, cat_y_test, cat_y_val,\
+        specs_no, aux_input_no, sonotypes_no, x_test_no, x_val_no, cat_y_test_no, cat_y_val_no, y_test_no, y_test
 
 
 class TestCallback(keras.callbacks.Callback):
     '''
     The class used to test and check test stats
-    during the training process 
+    during the training process
     '''
 
     def __init__(self, test_data):
@@ -418,8 +462,8 @@ class TestCallback(keras.callbacks.Callback):
 def build_finetune_model(base_model, dropouts, fc_layers, num_classes):
     '''
     finetune the model, freeze teh top layers,
-    add dropouts, dense layers, 
-    another input layer for auxiliary input 
+    add dropouts, dense layers,
+    another input layer for auxiliary input
     and concatenate it with the flatten layer
     '''
     # fix the base layers
@@ -478,11 +522,11 @@ if __name__ == "__main__":
     )
 
     numUsed = 6
-    # min_type = 3, the minimum sample size to use, not used here
+    fixed = False
     all_result = []
     all_result_no = []
+    all_result_aug = []
     all_type_used = []
-    all_result_print = []
 
     # i for the fixed size for the sonotypes
     for i in range(3, 20):
@@ -491,13 +535,13 @@ if __name__ == "__main__":
         tf.keras.backend.clear_session()
         typeUsed, sizes, specs, aux_input, sonotypes, x_test, x_val, cat_y_test, cat_y_val = None, None, None, None, None, None, None, None, None
 
-        # get data
-        typeUsed, sizes, specs, aux_input, sonotypes, x_test, x_val, cat_y_test, cat_y_val = get_samples(
-            numUsed, i)
+        typeUsed, sizes, specs, aux_input, sonotypes, x_test, x_val, cat_y_test, cat_y_val,specs_no,aux_input_no, sonotypes_no, x_test_no, x_val_no, cat_y_test_no, cat_y_val_no, y_test_no, y_test = get_samples(
+            numUsed, i, fixed)
 
         all_type_used.append(typeUsed)
         # print("all type used", all_type_used)
 
+        # Augmented
         # load model
         model = None
         keras.backend.clear_session()
@@ -510,36 +554,103 @@ if __name__ == "__main__":
 
         # earlystopping, checkpoiint, before
         filepath = 'model_group.hdf5'
-        # stop after 15 epoches without reduction of validation loss
         earlystop = EarlyStopping(
             monitor='val_loss', mode='min', verbose=1, patience=15)
-        # save the model with lowest validation loss
         checkpoint = ModelCheckpoint(filepath, monitor='val_loss', verbose=1,
                                      save_best_only=True, save_weights_only=False, mode='auto', period=1)
         opt = Adam(lr=config["learn_rate"])
         model.compile(optimizer=opt, loss='categorical_crossentropy',
                       metrics=['accuracy'])
+        cat_y_train = to_categorical(sonotypes, num_classes=len(typeUsed))
 
         # training
-        cat_y_train = to_categorical(sonotypes, num_classes=len(typeUsed))
-        history = model.fit(x=[normalize(specs), aux_input], y=cat_y_train, validation_data=(
+        history = model.fit(x=[specs, aux_input], y=cat_y_train, validation_data=(
             x_val, cat_y_val), epochs=300, verbose=0, callbacks=[checkpoint, earlystop, TestCallback((x_test, cat_y_test))])
 
         # test: load the model with best weights
         model = None
         keras.backend.clear_session()
         model = load_model(filepath)
+
         results = model.evaluate(x=x_test, y=cat_y_test)
+        # for roc/auc
+        y_score = model.predict(x_test)
+        y_class = [typeUsed[i]
+                   for i in np.argmax(y_score, axis=1)]  # predicted class
+        y_true = [typeUsed[i] for i in y_test]  # true class
+        roc_score = roc_auc_score(
+            y_test, y_score, sample_weight=None, multi_class="ovo")
 
-        all_result_no.append(results)
-        # format the result
-        all_result_print.append("%s, %s, %s\n" % ("; ".join(map(str, typeUsed.flatten())),
-                                                  "; ".join(map(str, sizes)), ", ".join(map(str, results))))
-
-        # print during the loop in case of unexpected stop from the server
-        print("all result used: ", all_result_no)
+        all_result.append(results)
+        # print("test loss, test acc:", results)
+        print("all result used: ", all_result)
         print("all type used: ", all_type_used)
-        print("".join(all_result_print))
 
-    # print all the formated results
-    print("".join(all_result_print))
+        # typeuse, sizes, results(acc,loss),roc, y_score, y_class,y_true
+        all_result_aug.append("%s, %s, %s, %s, %s, %s, %s\n" % ("; ".join(map(str, typeUsed.flatten())),
+                                                      "; ".join(map(str, sizes)),
+                                                      ", ".join(map(str, results)),
+                                                      str(roc_score),
+                                                      ";".join(" ".join(str(num) for num in sub) for sub in y_score),
+                                                      ";".join([str(x) for x in y_class]),
+                                                      ";".join([str(x) for x in y_true])
+                                                      ))
+        print("".join(all_result_aug))
+
+        # no aug
+        # load model
+        model = None
+        keras.backend.clear_session()
+        model = VGG19(weights='imagenet', include_top=False,
+                      input_shape=(224, 224, 3))
+        model = build_finetune_model(model,
+                                     [config["dropout"], config["dropout"]],
+                                     [config["hidden"], config["hidden"]],
+                                     len(typeUsed))
+
+        # earlystopping, checkpoiint, before
+        filepath = 'model_group_no.hdf5'
+        earlystop = EarlyStopping(
+            monitor='val_loss', mode='min', verbose=1, patience=15)
+        checkpoint = ModelCheckpoint(filepath, monitor='val_loss', verbose=1,
+                                     save_best_only=True, save_weights_only=False, mode='auto', period=1)
+        opt = Adam(lr=config["learn_rate"])
+        model.compile(optimizer=opt, loss='categorical_crossentropy',
+                      metrics=['accuracy'])
+        cat_y_train_no = to_categorical(sonotypes_no, num_classes=len(typeUsed))
+
+        # training
+        history = model.fit(x=[specs_no, aux_input_no], y=cat_y_train_no, validation_data=(
+            x_val_no, cat_y_val_no), epochs=300, verbose=0, callbacks=[checkpoint, earlystop, TestCallback((x_test_no, cat_y_test_no))])
+
+        # test: load the model with best weights
+        model = None
+        keras.backend.clear_session()
+        model = load_model(filepath)
+
+        results = model.evaluate(x=x_test_no, y=cat_y_test_no)
+        # for roc/auc
+        y_score = model.predict(x_test_no)
+        y_class = [typeUsed[i]
+                   for i in np.argmax(y_score, axis=1)]  # predicted class
+        y_true = [typeUsed[i] for i in y_test_no]  # true class
+        roc_score = roc_auc_score(
+            y_test_no, y_score, sample_weight=None, multi_class="ovo")
+
+        # typeuse, sizes, results(acc,loss),roc, y_score, y_class,y_true
+        all_result_no.append("%s, %s, %s, %s, %s, %s, %s\n" % ("; ".join(map(str, typeUsed.flatten())),
+                                                      "; ".join(map(str, sizes)),
+                                                      ", ".join(map(str, results)),
+                                                      str(roc_score),
+                                                      ";".join(" ".join(str(num) for num in sub) for sub in y_score),
+                                                      ";".join([str(x) for x in y_class]),
+                                                      ";".join([str(x) for x in y_true])
+                                                      ))
+        print("".join(all_result_no))
+
+    print("Fixed size or not:", fixed)
+    print("aug")
+    print("".join(all_result_aug))
+
+    print("no aug")
+    print("".join(all_result_no))

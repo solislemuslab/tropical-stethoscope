@@ -12,19 +12,17 @@
 
 Those are the files used for experiments.
 
-`classification_with_augmentation.py`: the file that run on the condor for the experiment to randomly select sonotypes without fixing sizes, augment, trian, and check classification performance.
+`classification_fix_6_sono.py`: the file that run on the condor for the experiment to randomly select sonotypes, use same (fixed) or original size (specified with parameter in main) for all the sonotypes in one run, augment, trian, and check classification performance. Note that we only compute auc/roc and accuracy in the script but we record necessary data for all the other methods for performance evaluation.
 
-`classification_fixed_size.py`: the file that run on the condor for the experiment to randomly select sonotypes, use same (fixed) size for all the sonotypes in one run, augment, trian, and check classification performance.
-
-`experiment_aug_no_aug.py`: the file that run on the condor for the experiment to select sonotypes with fixed sample size, train with and without augmentation, and check classification performance.
+`experiment_2_to_6.py`: the file that run on the condor for the experiment to select sonotypes with fixed sample size (49), train with and without augmentation, and check classification performance.
 
 ### script_submit folder
 
-Inside are files that are used to submit jobs to the condor to run the python scripts.
+Inside are files that are used to submit jobs to the CHTC to run the python scripts.
 
 ## Notes
 
 Data are not pushed to this repo
 
-The files `classification_with_augmentation.py`, `classification_fixed_size.py`, `experiment_aug_no_aug.py` and `classification_with_augmentation.ipynb` are similar with slight differences for different experiments.
+The files`classification_fix_6_sono.py`, `experiment_2_to_6.py` and `classification_with_augmentation.ipynb` are similar with slight differences for different experiments.
 

@@ -11,3 +11,4 @@ dependencies:
   - opencv
   - h5py
   - pandas
+  - scikit-learn

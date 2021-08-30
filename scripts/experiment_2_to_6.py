@@ -2,7 +2,7 @@
 This is the script to randomly picked a given number of sonotypes
 with sample sizes above a given number.
 Then, augment the samples and classification.
-Record the classification performance 
+Record the classification performance
 between augmentation and no augmentation.
 
 As the script is to be run on the server with parallel computing,
@@ -25,8 +25,8 @@ from keras.models import Model, load_model
 from keras.callbacks import EarlyStopping, ModelCheckpoint
 from keras.layers import Dense, Activation, Flatten, Dropout, Input, concatenate
 import cv2
-import csv
 import tensorflow as tf
+from sklearn.metrics import roc_auc_score
 
 
 """Normalization"""
@@ -270,23 +270,24 @@ def get_samples(numUsed, num_pick=49):
     # get groups
     typeUsed = []
     # while len(typeUsed) < numUsed:
-    index = 0
-    while len(typeUsed) < 6:  # always use top six for birs so far
-        cur_type = s_unique[s_freq_order][index]
-        if sono2group[cur_type] == b'b':  # use bird for now
-            typeUsed.append(cur_type)
-        index += 1
+    # index = 0
+    # while len(typeUsed) < 6:  # always use top six birds
+    #     cur_type = s_unique[s_freq_order][index]
+    #     if sono2group[cur_type] == b'b':  # use bird for now
+    #         typeUsed.append(cur_type)
+    #     index += 1
 
-    random.shuffle(typeUsed)
-    typeUsed = typeUsed[:numUsed]
+    # random.shuffle(typeUsed)
+    # typeUsed = typeUsed[:numUsed]
 
-    # if do not specify types
-    # type_index = np.argwhere((s_freq_desc >= num_pick) & (
-    #     s_unique[s_freq_order] > 0)).flatten()
-    # random.shuffle(type_index)
-    # type_index = np.sort(type_index[:numUsed])
-    # typeUsed = s_unique[s_freq_order][type_index]
-    # print("type index:", type_index)
+    # if do not specify taxonomic groups, use positive s_unique
+    # as the negative ones are noises
+    type_index = np.argwhere((s_freq_desc >= num_pick) & (
+        s_unique[s_freq_order] > 0)).flatten()
+    random.shuffle(type_index)
+    type_index = np.sort(type_index[:numUsed])
+    typeUsed = s_unique[s_freq_order][type_index]
+    print("type index:", type_index)
 
     print("type used: ", typeUsed)
 
@@ -347,7 +348,7 @@ def get_samples(numUsed, num_pick=49):
     print("train, test, val size:", specs.shape[0], len(
         cat_y_test), len(cat_y_val))
 
-    return typeUsed, specs, aux_input, sonotypes, x_test, x_val, cat_y_test, cat_y_val
+    return typeUsed, specs, aux_input, sonotypes, x_test, x_val, cat_y_test, cat_y_val, y_test
 
 
 class TestCallback(keras.callbacks.Callback):
@@ -398,8 +399,8 @@ def gen(specs, aux_input, sonotypes):
 def build_finetune_model(base_model, dropouts, fc_layers, num_classes):
     '''
     finetune the model, freeze teh top layers,
-    add dropouts, dense layers, 
-    another input layer for auxiliary input 
+    add dropouts, dense layers,
+    another input layer for auxiliary input
     and concatenate it with the flatten layer
     '''
     # fix the base layers
@@ -466,9 +467,9 @@ if __name__ == "__main__":
         for j in range(2, 6):  # sonotype number
             print("\niteration: ", i, ", cur #classes: ", j)
             tf.keras.backend.clear_session()
-            typeUsed, specs, aux_input, sonotypes, x_test, x_val, cat_y_test, cat_y_val = None, None, None, None, None, None, None, None
+            typeUsed, specs, aux_input, sonotypes, x_test, x_val, cat_y_test, cat_y_val, y_test = None, None, None, None, None, None, None, None, None
 
-            typeUsed, specs, aux_input, sonotypes, x_test, x_val, cat_y_test, cat_y_val = get_samples(
+            typeUsed, specs, aux_input, sonotypes, x_test, x_val, cat_y_test, cat_y_val, y_test = get_samples(
                 j)
             all_type_used.append(typeUsed)
             print("all type used", all_type_used)
@@ -505,10 +506,28 @@ if __name__ == "__main__":
 
             results = model.evaluate(x=x_test, y=cat_y_test)
             all_result_no.append("%s, %s\n" % ("; ".join(map(str, typeUsed.flatten())), ", ".join(map(str, results))))
-            # all_result_no.append(results)
-            print("test loss, test acc:", results)
-            print(all_result_no)
 
+            # for roc/auc and other data
+            y_score = model.predict(x_test)
+            # predicted class
+            y_class = [typeUsed[i]
+                    for i in np.argmax(y_score, axis=1)]
+            # true class
+            y_true = [typeUsed[i] for i in y_test]
+            if (j == 2):
+                roc_score = roc_auc_score(y_test, y_score[:,1], sample_weight=None, multi_class="ovo")
+            else:
+                roc_score = roc_auc_score(y_test, y_score, sample_weight=None, multi_class="ovo")
+
+            all_result_no.append("%s, %s, %s, %s, %s, %s\n" % ("; ".join(map(str, typeUsed)),
+                                                ", ".join(map(str, results)),
+                                                str(roc_score),
+                                                ";".join(" ".join(str(num) for num in sub) for sub in y_score),
+                                                ";".join([str(x) for x in y_class]),
+                                                ";".join([str(x) for x in y_true])
+                                                ))
+
+            
             # with augmentation
             model = None
             keras.backend.clear_session()
@@ -531,7 +550,9 @@ if __name__ == "__main__":
                           metrics=['accuracy'])
 
             history = model.fit_generator(gen(specs, aux_input, sonotypes),
-                                          steps_per_epoch=len(specs) // 4, epochs=300, validation_data=(x_val, cat_y_val), verbose=2, callbacks=[checkpoint, earlystop, TestCallback((x_test, cat_y_test))])
+                                          steps_per_epoch=len(specs) // 4, epochs=300, 
+                                          validation_data=(x_val, cat_y_val), verbose=2, 
+                                          callbacks=[checkpoint, earlystop, TestCallback((x_test, cat_y_test))])
 
             # test: load the model with lowest validation loss
             model = None
@@ -539,11 +560,31 @@ if __name__ == "__main__":
             model = load_model(filepath)
 
             results = model.evaluate(x=x_test, y=cat_y_test)
-            
-            # all_result_aug.append(results)
-            all_result_aug.append("%s, %s\n" % ("; ".join(map(str, typeUsed.flatten())), ", ".join(map(str, results))))
-            print("test loss, test acc:", results)
-            
+            # for roc/auc and other data
+            y_score = model.predict(x_test)
+            # predicted class
+            y_class = [typeUsed[i]
+                    for i in np.argmax(y_score, axis=1)]
+            # true class
+            y_true = [typeUsed[i] for i in y_test]
+
+            if (j == 2):
+                roc_score = roc_auc_score(y_test, y_score[:,1], sample_weight=None, multi_class="ovo")
+            else:
+                roc_score = roc_auc_score(y_test, y_score, sample_weight=None, multi_class="ovo")
+
+
+            all_result_aug.append("%s, %s, %s, %s, %s, %s\n" % ("; ".join(map(str, typeUsed)),
+                                                      ", ".join(map(str, results)),
+                                                      str(roc_score),
+                                                      ";".join(" ".join(str(num) for num in sub) for sub in y_score),
+                                                      ";".join([str(x) for x in y_class]),
+                                                      ";".join([str(x) for x in y_true])
+                                                      ))
+
             # print here in case of unexpected stop of the server
             print(all_result_aug)
             print(all_result_no)
+
+    print("aug", "".join(all_result_aug))
+    print("no", "".join(all_result_no))

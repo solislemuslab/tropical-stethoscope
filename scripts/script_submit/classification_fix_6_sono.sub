@@ -1,0 +1,23 @@
+universe = vanilla
+log = output/classification_fix_6_sono$(Cluster)_$(Process).log
+error = output/classification_fix_6_sono$(Cluster)_$(Process).err
+
+executable = classification_fix_6_sono.sh
+arguments = $(Process)
+output = output/classification_fix_6_sono_$(Cluster)_$(Process).out
+
+should_transfer_files = YES
+when_to_transfer_output = ON_EXIT
+transfer_input_files = environment.yml, classification_fix_6_sono.py 
+
+Requirements = (Target.HasCHTCStaging == true) && (CUDADriverVersion >= 10.0)
+
+# GPU
+request_gpus = 1
++WantGPULab = true
+request_cpus = 1
+request_memory = 30GB
+request_disk = 30GB
++GPUJobLength = "medium" 
+
+queue 50

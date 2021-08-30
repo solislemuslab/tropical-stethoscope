@@ -11,11 +11,8 @@ conda install conda
 conda env create -f environment.yml
 source activate tf-gpu
 
-# for Could not create cudnn handle: CUDNN_STATUS_INTERNAL_ERROR
-export TF_FORCE_GPU_ALLOW_GROWTH='true'
-
 # run the script
 cp /staging/ysun299/whole_data_1110.hdf5 ./
-python3 classification_with_augmentation.py
+python3 experiment_2_to_6.py
 rm whole_data_1110.hdf5
 rm model_group.hdf5

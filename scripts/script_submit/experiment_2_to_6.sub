@@ -1,14 +1,14 @@
 universe = vanilla
-log = output/classification_8_$(Cluster)_$(Process).log
-error = output/classification_8_$(Cluster)_$(Process).err
+log = output/experiment_2_to_6.log
+error = output/experiment_2_to_6_$(Cluster)_$(Process).err
 
-executable = classification_conda.sh
+executable = experiment_2_to_6.sh
 arguments = $(Process)
-output = output/classification_8_$(Cluster)_$(Process).out
+output = output/experiment_2_to_6_$(Cluster)_$(Process).out
 
 should_transfer_files = YES
 when_to_transfer_output = ON_EXIT
-transfer_input_files = environment.yml, classification_with_augmentation.py 
+transfer_input_files = environment.yml, experiment_2_to_6.py 
 
 Requirements = (Target.HasCHTCStaging == true) && (CUDADriverVersion >= 10.0)
 
@@ -20,4 +20,4 @@ request_memory = 20GB
 request_disk = 20GB
 +GPUJobLength = "medium" 
 
-queue 50
+queue 30

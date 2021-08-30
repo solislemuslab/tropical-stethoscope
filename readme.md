@@ -4,7 +4,7 @@ Yuren Sun, Tatiana Midori Maeda, Claudia Solis-Lemus, Daniel Pimentel-Alarcon, Z
 
 ## Usage
 
-If you are interested to use our neural network model in your own data, please follow the steps in the `example` folder.
+If you are interested to try out our methods or use our neural network model in your own data, please follow the steps in the `example` folder.
 All the python scripts can be found in the `scripts` folder for the data analyses presented in the manuscript.
 
 

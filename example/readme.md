@@ -40,6 +40,7 @@ cudatoolkit=10.0
 keras==2.3.1
 scipy
 soundfile
+scikit-learn
 ```
 
 5. Run `JupyterLab` by typing `jupyter-lab` in the terminal. A browser page will be opened automatically where you will find the `sample_classification_with_augmentation.ipynb` jupyter notebook from the folder you just cloned.

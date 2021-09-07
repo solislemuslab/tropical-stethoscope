@@ -7,3 +7,4 @@ tensorflow==1.14.0
 keras==2.3.1
 scipy
 soundfile
+scikit-learn

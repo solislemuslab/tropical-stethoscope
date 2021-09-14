@@ -1,6 +1,6 @@
 # Fitting the neural network model on a sample dataset
 
-We provide a sample dataset to fit the neural network model on Google Drive [here](https://drive.google.com/file/d/101Mnahr0ZPVz1eFyBniNPNJ0NltlVhk6/view?usp=sharing). The sample dataset contains data on 6 sonotypes of birds (the classes that we want to classify with the neural network model) and noise data that are used to augment the dataset of sonotypes.
+We provide a sample dataset to fit the neural network model on Google Drive [here](https://drive.google.com/file/d/101Mnahr0ZPVz1eFyBniNPNJ0NltlVhk6/view?usp=sharing). The sample dataset contains data on 6 sonotypes of birds (the classes that we want to classify with the neural network model) and noise data that are used to augment the dataset of bird sonotypes.
 
 The sample dataset is stored in [HDF5](https://en.wikipedia.org/wiki/Hierarchical_Data_Format) and is about 480mb in size format. It consists of 5 arrays (lists). The elements in each array are described below.
 - Image (spectrogram) of the sonotype with size 244 * 244 * 3 ( 3 channel 224 * 224 pixels image) as float. 

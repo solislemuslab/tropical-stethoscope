@@ -31,12 +31,12 @@ pip3 install -r requirements.txt
 The `requirements.txt` is inside the `example` folder that was cloned and it lists the requirements below:
 ```
 numpy
-opencv
+opencv-python
 h5py
 pandas
 tensorflow-gpu==1.14.0
 tensorflow==1.14.0
-cudatoolkit=10.0
+cudatoolkit==10.0
 keras==2.3.1
 scipy
 soundfile

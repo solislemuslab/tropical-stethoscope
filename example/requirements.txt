@@ -2,7 +2,7 @@ numpy
 opencv-python
 h5py
 pandas
-tensorflow-gpu==1.14.0
+tensorflow-gpu==2.5.1
 tensorflow==1.14.0
 cudatoolkit==10.0
 keras==2.3.1

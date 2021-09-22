@@ -22,10 +22,11 @@ You need to follow the steps (mainly aimed at Mac or Linux users):
 
 2. Type `git clone https://github.com/solislemuslab/tropical-stethoscope.git` to download the entire GitHub repository.
 
-3. Download `JupyterLab` by typing: `conda install -c conda-forge jupyterlab`. More instructions can be found [here](https://jupyter.org/).
+3. Download `JupyterLab` by typing: `conda install -c conda-forge jupyterlab`. More instructions can be found [here](https://jupyter.org/). An easier alternative for step 3 - 5 (environment setup) is Google Colab. More instructions about it can be found in the bottom of this section.
 
 4. Download the necessary packages by typing the following in the terminal: 
 ```  
+conda install cudatoolkit
 pip3 install -r requirements.txt
 ```
 The `requirements.txt` is inside the `example` folder that was cloned and it lists the requirements below:
@@ -33,19 +34,16 @@ The `requirements.txt` is inside the `example` folder that was cloned and it lis
 numpy
 opencv-python
 h5py
-pandas
-tensorflow-gpu==1.14.0
-tensorflow==1.14.0
-cudatoolkit==10.0
-keras==2.3.1
+tensorflow==2.6.0
 scipy
 soundfile
 scikit-learn
 ```
 
-5. Run `JupyterLab` by typing `jupyter-lab` in the terminal. A browser page will be opened automatically where you will find the `sample_classification_with_augmentation.ipynb` jupyter notebook from the folder you have just cloned.
+Note that we specify tensorflow version to be 2.6.0, but our codes should generally work with tensorflow 2.x versions.
 
-6. Change the path in the 3rd code block (Read the dataset) in `sample_classification_with_augmentation.ipynb` to where you stored the sample HDF5 file and run all the code blocks. The training speed might differ in the laptop processors but it should take less than 2 hours.
+1. Run `JupyterLab` by typing `jupyter-lab` in the terminal. A browser page will be opened automatically where you will find the `sample_classification_with_augmentation.ipynb` jupyter notebook from the folder you have just cloned.
+2. Change the path in the 3rd code block (Read the dataset) in `sample_classification_with_augmentation.ipynb` to where you stored the sample HDF5 file and run all the code blocks. The training speed might differ in the laptop processors but it should take less than 2 hours.
 
 Note that one alternative to use `JupyterLab` is to use Google Colab, an online version for jupyter notebook. Instructions can be found [here](https://colab.research.google.com/). When using Colab to fit the model with `sample_classification_with_augmentation.ipynb`, please remember to use the GPU run time when fitting the model, which could be found at Runtime > Change runtime type and select GPU as Hardware accelerator (otherwise, the training process might be extremely slow). Google Colab limits the resources that we can use for free within a period of time, including the GPU, but the limited resources is enough for this example. You do not need to do this when running `sample_dataset_creation.ipynb` as CPU runtime is enough for dataset creation.
 

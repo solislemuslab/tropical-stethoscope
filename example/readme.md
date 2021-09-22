@@ -34,13 +34,13 @@ The `requirements.txt` is inside the `example` folder that was cloned and it lis
 numpy
 opencv-python
 h5py
-tensorflow==2.6.0
+tensorflow>=2.0.0
 scipy
 soundfile
 scikit-learn
 ```
 
-Note that we specify tensorflow version to be 2.6.0, but our codes should generally work with tensorflow 2.x versions.
+Note that we use tensorflow version 2.6.0 when creating the example, but our codes should work generally with tensorflow versions >= 2.0.0.
 
 1. Run `JupyterLab` by typing `jupyter-lab` in the terminal. A browser page will be opened automatically where you will find the `sample_classification_with_augmentation.ipynb` jupyter notebook from the folder you have just cloned.
 2. Change the path in the 3rd code block (Read the dataset) in `sample_classification_with_augmentation.ipynb` to where you stored the sample HDF5 file and run all the code blocks. The training speed might differ in the laptop processors but it should take less than 2 hours.

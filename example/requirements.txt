@@ -1,11 +1,7 @@
 numpy
 opencv-python
 h5py
-pandas
-tensorflow-gpu==1.14.0
-tensorflow==1.14.0
-cudatoolkit==10.0
-keras==2.3.1
+tensorflow>=2.0.0
 scipy
 soundfile
 scikit-learn

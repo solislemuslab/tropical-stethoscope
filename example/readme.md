@@ -22,7 +22,7 @@ You need to follow the steps (mainly aimed at Mac or Linux users):
 
 2. Type `git clone https://github.com/solislemuslab/tropical-stethoscope.git` to download the entire GitHub repository.
 
-3. Download `JupyterLab` by typing: `conda install -c conda-forge jupyterlab`. More instructions can be found [here](https://jupyter.org/). Note that the instructions to set up environment (step 3-5) that we provide are for CPU users. However, it would be slow to use CPU to train neural network models. Faster alternatives for environment are Google Colab (instructions about it can be found in the bottom of this section) and servers with GPU.
+3. Download `JupyterLab` by typing: `conda install -c conda-forge jupyterlab`. More instructions can be found [here](https://jupyter.org/). Note that the instructions to set up environment (step 3-5) that we provide are for CPU users. However, it would be slow to use CPU to train neural network models. Faster alternatives are Google Colab and servers with GPU (instructions about them can be found in the bottom of this section).
 
 4. Download the necessary packages by typing the following in the terminal: 
 ```  
@@ -44,7 +44,11 @@ Note that we use tensorflow version 2.6.0 when creating the example, but our cod
 5. Run `JupyterLab` by typing `jupyter-lab` in the terminal. A browser page will be opened automatically where you will find the `sample_classification_with_augmentation.ipynb` jupyter notebook from the folder you have just cloned.
 6. Change the path in the 3rd code block (Read the dataset) in `sample_classification_with_augmentation.ipynb` to where you stored the sample HDF5 file and run all the code blocks. The training speed might differ in the laptop processors but it should take less than 2 hours when using GPU.
 
+### Instructions for Google Colab and environment set up for GPU servers
+
 Note that one alternative to use `JupyterLab` is to use Google Colab, an online version for jupyter notebook. Instructions can be found [here](https://colab.research.google.com/). When using Colab to fit the model with `sample_classification_with_augmentation.ipynb`, please remember to use the GPU run time, which could be found at Runtime > Change runtime type and select GPU as Hardware accelerator (otherwise, the training process might be slow with CPU run time). Google Colab limits the resources that we can use for free within a period of time, including the GPU, but the limited resources is enough for this example. You do not need use GPU accelerator when running `sample_dataset_creation.ipynb` as CPU runtime is enough for dataset creation.
+
+To set up GPU servers, you can refer to `environment.yml` and `classification_fix_6_sono.sh` or `experiment_2_to_6.sh` in `scripts/script_submit` folder (`scripts` folder stores the files that we use to conduct experiments on GPU servers). The two shell scripts are similar. They set up the environment and execute Python scripts to run tensorflow with GPU. Note that when running this example, you need to change the versions of tensorflow and tensorflow-gpu to >= 2.0.0 (the current version in yml file is 1.14.0).
 
 # Fitting the neural network model on your own data
 

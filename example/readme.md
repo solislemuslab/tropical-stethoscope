@@ -53,7 +53,7 @@ To set up environment on GPU servers, please check the following files in the `s
 - `classification_fix_6_sono.sh`
 - `experiment_2_to_6.sh`
  
-Note that the `scripts` folder stores the files that we use to conduct experiments on GPU servers. The two shell scripts are similar. They set up the environment and execute Python scripts to run tensorflow with GPU. Note that when running this example, you need to change the versions of tensorflow and tensorflow-gpu to >= 2.0.0 (the current version in yml file is 1.14.0).
+Note that the `scripts` folder stores the files that we use to conduct experiments on GPU servers. The two shell scripts are similar. They set up the environment and execute Python scripts to run tensorflow with GPU. Note that when running this example, you need to change the versions of tensorflow and tensorflow-gpu to >= 2.0.0 in the `environment.yml` file (the current version in yml file is 1.14.0).
 
 # Fitting the neural network model on your own data
 

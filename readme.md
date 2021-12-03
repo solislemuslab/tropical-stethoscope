@@ -14,7 +14,7 @@ Our code is licensed under the [MIT](https://opensource.org/licenses/MIT) licens
 ## Citation
 If you use the code in your work, we kindly ask that you cite the following paper:
 ```
-(upcoming)
+Sun, Y., Maeda, T. M., Solis-Lemus, C., Pimentel-Alarcon, D., & Burivalova, Z. (2021). Classification of animal sounds in a hyperdiverse rainforest using Convolutional Neural Networks. arXiv:2111.14971. http://arxiv.org/abs/2111.14971
 ```
 
 ## Feedback, issues and questions

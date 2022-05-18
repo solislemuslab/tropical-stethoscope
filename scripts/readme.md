@@ -1,12 +1,14 @@
+The files in this folder provide similar functions as those in the `example` folder.  The files here are used to run similar jobs on HTCondor repeatedly for the data analyses presented in the manuscript. If you are interested to try out our methods or use our neural network model in your own data, please follow the steps in the `example` folder.
+
 ## Files description
 
 ### Jupyter Notebooks:
 
-`dataset_creation.ipynb`: the notebook to create the dataset in hdf5 format
+`dataset_creation.ipynb`: the notebook to create the dataset in hdf5 format.
 
 `classification_with_augmentation.ipynb`: the notebook for classifiaction model with augmentation functions.
 
-`figures.ipynb`: the notebook to plot figures
+`figures.ipynb`: the notebook to plot figures.
 
 ### Python scripts:
 
@@ -18,11 +20,11 @@ Those are the files used for experiments.
 
 ### script_submit folder
 
-Inside are files that are used to submit jobs to the CHTC to run the python scripts.
+Inside are files that are used to submit jobs to the HTCondor to run the python scripts. The  `sub`  files are used to submit the jobs to HTCondor to run the scripts. The `sh` files can be used to set up the environment and run the python scripts with requirements listed in `environment.yml`.
 
 ## Notes
 
-Data are not pushed to this repo
+Data are not pushed to this repo.
 
 The files`classification_fix_6_sono.py`, `experiment_2_to_6.py` and `classification_with_augmentation.ipynb` are similar with slight differences for different experiments.
 
